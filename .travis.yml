@@ -1,0 +1,12 @@
+laguage: generic
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker --version
+
+script:
+  - make ci-e2e-test
