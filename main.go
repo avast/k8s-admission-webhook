@@ -13,8 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// https://github.com/kubernetes/kubernetes/tree/release-1.9/test/images/webhook
-
 func isResourceSet(resList corev1.ResourceList, name corev1.ResourceName) bool {
 	var missing = resList == nil
 	if !missing {
