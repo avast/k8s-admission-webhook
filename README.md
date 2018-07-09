@@ -10,7 +10,7 @@
 
 A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to aid with enforcing best practices within your cluster.
 
-Can be set it up to validate that:
+Can be set up to validate that:
 * containers have their resource limits specified (`memory`, `cpu`)
 * containers have their resource requests specified (`memory`, `cpu`)
 
@@ -56,7 +56,7 @@ See [test/webhook.template.yaml](test/webhook.template.yaml), which contains an 
 Certain places of the example configuration YAML contain references to variables:
 * `${WEBHOOK_IMAGE_NAME}` (in `Deployment`): the Docker image name, e.g. `avastsoftware/k8s-admission-webhook:v0.0.1`
 * `${WEBHOOK_TLS_CERT}` (in the `ConfigMap`) and `${WEBHOOK_TLS_PRIVATE_KEY_B64}` in the (`Secret`): webhook server's TLS certificate
-  - You can generate an appropriate certificate by running `./test/create-signed-cert.sh --namespace default --service k8s-admission-webhook`. You'll need to have `kubectl` on your `PATH`, with its current context pointing at the target cluster.
+  - You can generate an appropriate certificate by running `./test/create-signed-cert.sh --namespace default --service k8s-admission-webhook.default.svc`. You'll need to have `kubectl` on your `PATH`, with its current context pointing at the target cluster.
   - `--namespace` and `--service` in the above command need to reflect the namespace and name of webhook's `Service`, and also need to match the related configuration in the `ValidatingWebhookConfiguration` and the `Service` itself.
   - Running the above command will drop `test/server-cert.pem` and `test/server-key.pem`, which correspond to the server certificate and its private key, respectively.
   - `${WEBHOOK_TLS_CERT}` (in the `ConfigMap`) is the contents of the generated `test/server-cert.pem`.
@@ -70,7 +70,7 @@ The webhook is written in Go and uses [Glide](https://glide.sh/) for dependency 
 ### Development cluster & webhook deployment automation
 One of the more convenient ways to spin up a dev Kubernetes cluster for local testing is [kubeadm-dind-cluster](https://github.com/kubernetes-sigs/kubeadm-dind-cluster), which runs the cluster using Docker-in-Docker. Makefile targets in this project make use of it to aid with most common development tasks and also enable running integration tests in Travis. You can use the more traditional `minikube` if you want, but you'll need to set up the webhook manually or write your own automation scripts.
 
-These are some `make` targets intented to be used during local development. Note that they require `docker`, `wget`, `openssl` and `envsubst` on your `PATH` and have only been tested on Linux.
+These are some `make` targets intended to be used during local development. Note that they require `docker`, `wget`, `openssl` and `envsubst` on your `PATH` and have only been tested on Linux.
 * `make dev-start`: Starts the Docker-in-Docker Kubernetes cluster.
 * `make deploy-webhook-for-test`: Builds the webhook Docker image and configures the local cluster to use it. This is one of the more involved scripts because it includes generation of an appropriate TLS certificate, retrieving cluster's CA bundle and injecting those into the webhook config. Also, pushes the image to a temporary Docker registry reachable from within the local cluster.
 * `make dev-stop`: Stops the local cluster and performs additional cleanup.
