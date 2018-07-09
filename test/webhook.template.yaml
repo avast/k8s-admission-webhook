@@ -41,7 +41,7 @@ spec:
               value: /data/ssl_certs/server-cert.pem
             - name: TLS_PRIVATE_KEY_FILE
               value: /data/ssl_keys/server-key.pem
-            - name: PORT
+            - name: LISTEN_PORT
               value: "8443"
             - name: RULE_RESOURCE_LIMIT_CPU_REQUIRED
               value: "true"
