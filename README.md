@@ -4,7 +4,7 @@
 | ------------------ |-------------------|
 | Build status       | [![Build1][1]][2] |
 
-[1]: https://travis-ci.s-admission-webhook.svg?branch=master
+[1]: https://api.travis-ci.org/avast/k8s-admission-webhook.svg?branch=master
 [2]: https://travis-ci.org/avast/k8s-admission-webhook
 
 A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to aid with enforcing best practices within your cluster.
