@@ -1,5 +1,12 @@
 # avast/k8s-admission-webhook
 
+| Kubernetes version | v1.9              |
+| ------------------ |-------------------|
+| Build status       | [![Build1][1]][2] |
+
+[1]: https://travis-ci.s-admission-webhook.svg?branch=master
+[2]: https://travis-ci.org/avast/k8s-admission-webhook
+
 A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to aid with enforcing best practices within your cluster.
 
 Can be set it up to validate that:
