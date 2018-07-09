@@ -6,7 +6,9 @@ services:
   - docker
 
 before_install:
-  - docker --version
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  - make --version
 
 script:
   - make ci-e2e-test

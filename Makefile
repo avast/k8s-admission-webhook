@@ -4,6 +4,14 @@ TEST_REGISTRY_PORT=50001
 TEST_IMAGE_NAME=localhost:$(TEST_REGISTRY_PORT)/webhook-test
 KUBECTL=~/.kubeadm-dind-cluster/kubectl
 
+dev-start: setup-test-cluster
+dev-stop: cleanup-test-cluster cleanup-test-registry
+
+dev-e2e-test: deploy-webhook-for-test
+	echo "TODO"
+
+ci-e2e-test: setup-test-cluster dev-e2e-test
+
 apply-webhook:
 	@$(KUBECTL) delete deployment k8s-admission-webhook || true
 	cd test && \
@@ -15,9 +23,6 @@ apply-webhook:
 	  envsubst < webhook.template.yaml > webhook.yaml && \
  	  rm csr.conf server-*.pem && \
 	  $(KUBECTL) apply -f webhook.yaml
-
-dev-start: setup-test-cluster
-dev-stop: cleanup-test-cluster cleanup-test-registry
 
 setup-test-cluster:
 	wget https://cdn.rawgit.com/kubernetes-sigs/kubeadm-dind-cluster/master/fixed/$(DIND_CLUSTER_SCRIPT) -O ./test/$(DIND_CLUSTER_SCRIPT)
