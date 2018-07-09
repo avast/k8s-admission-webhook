@@ -15,7 +15,8 @@ ci-e2e-test: setup-test-cluster dev-e2e-test
 apply-webhook:
 	@$(KUBECTL) delete deployment k8s-admission-webhook || true
 	cd test && \
-	  ./create-signed-cert.sh --namespace default --service k8s-admission-webhook.default.svc && \
+	  export PATH=~/.kubeadm-dind-cluster:$$PATH && \
+	  	./create-signed-cert.sh --namespace default --service k8s-admission-webhook.default.svc && \
 	  WEBHOOK_IMAGE=$(TEST_IMAGE_NAME) \
 	  WEBHOOK_TLS_CERT=$$(cat server-cert.pem | sed 's/^/     /') \
 	  WEBHOOK_TLS_PRIVATE_KEY_B64=$$(cat server-key.pem | base64 | tr -d '\n') \
