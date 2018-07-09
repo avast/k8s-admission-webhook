@@ -1,0 +1,21 @@
+FROM golang:1.10-stretch AS builder
+
+RUN curl https://glide.sh/get | sh
+
+WORKDIR /go/src/github.com/avast/k8s-admission-webhook
+
+COPY glide.* /go/src/github.com/avast/k8s-admission-webhook/
+RUN glide install -v
+
+COPY . . 
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s"
+
+# ---
+FROM scratch
+
+WORKDIR /app
+
+COPY --from=builder /go/src/github.com/avast/k8s-admission-webhook/k8s-admission-webhook .
+
+ENTRYPOINT ["./k8s-admission-webhook"]
