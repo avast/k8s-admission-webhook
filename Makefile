@@ -2,18 +2,19 @@ KUBERNETES_VERSION=1.9
 DIND_CLUSTER_SCRIPT=dind-cluster-v$(KUBERNETES_VERSION).sh
 TEST_REGISTRY_PORT=50001
 TEST_IMAGE_NAME=localhost:$(TEST_REGISTRY_PORT)/webhook-test
+KUBECTL=~/.kubeadm-dind-cluster/kubectl
 
 apply-webhook:
-	@kubectl delete deployment k8s-admission-webhook || true
+	@$(KUBECTL) delete deployment k8s-admission-webhook || true
 	cd test && \
 	  ./create-signed-cert.sh --namespace default --service k8s-admission-webhook.default.svc && \
 	  WEBHOOK_IMAGE=$(TEST_IMAGE_NAME) \
 	  WEBHOOK_TLS_CERT=$$(cat server-cert.pem | sed 's/^/     /') \
 	  WEBHOOK_TLS_PRIVATE_KEY_B64=$$(cat server-key.pem | base64 | tr -d '\n') \
-	  WEBHOOK_CA_BUNDLE=$$(kubectl get configmap -n kube-system extension-apiserver-authentication -o=jsonpath='{.data.client-ca-file}' | base64 | tr -d '\n') \
+	  WEBHOOK_CA_BUNDLE=$$($(KUBECTL) get configmap -n kube-system extension-apiserver-authentication -o=jsonpath='{.data.client-ca-file}' | base64 | tr -d '\n') \
 	  envsubst < webhook.template.yaml > webhook.yaml && \
  	  rm csr.conf server-*.pem && \
-	  kubectl apply -f webhook.yaml
+	  $(KUBECTL) apply -f webhook.yaml
 
 dev-start: setup-test-cluster
 dev-stop: cleanup-test-cluster cleanup-test-registry
