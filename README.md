@@ -53,7 +53,7 @@ Because of the above, the necessary Kubernetes manifests will vary based on your
 See [test/webhook.template.yaml](test/webhook.template.yaml), which contains an example definition of the various Kubernetes resources that might be typically involved when configuring the webhook.
 
 Certain places of the example configuration YAML contain references to variables:
-* `${WEBHOOK_IMAGE_NAME}` (in `Deployment`): the Docker image name, e.g. `avast/k8s-admission-webhook:v0.0.1`
+* `${WEBHOOK_IMAGE_NAME}` (in `Deployment`): the Docker image name, e.g. `avastsoftware/k8s-admission-webhook:v0.0.1`
 * `${WEBHOOK_TLS_CERT}` (in the `ConfigMap`) and `${WEBHOOK_TLS_PRIVATE_KEY_B64}` in the (`Secret`): webhook server's TLS certificate
   - You can generate an appropriate certificate by running `./test/create-signed-cert.sh --namespace default --service k8s-admission-webhook`. You'll need to have `kubectl` on your `PATH`, with its current context pointing at the target cluster.
   - `--namespace` and `--service` in the above command need to reflect the namespace and name of webhook's `Service`, and also need to match the related configuration in the `ValidatingWebhookConfiguration` and the `Service` itself.
