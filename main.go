@@ -58,7 +58,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 				config.RuleResourceLimitMemoryRequired, config.RuleResourceLimitMemoryRequiredMessage)
 			checkResourceIsSet(container.Resources.Requests, corev1.ResourceCPU,
 				config.RuleResourceRequestCPURequired, config.RuleResourceRequestCPURequiredMessage)
-			checkResourceIsSet(container.Resources.Requests, corev1.ResourceCPU,
+			checkResourceIsSet(container.Resources.Requests, corev1.ResourceMemory,
 				config.RuleResourceRequestMemoryRequired, config.RuleResourceRequestMemoryRequiredMessage)
 
 			if resourcesValidationError {
