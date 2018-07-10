@@ -1,11 +1,11 @@
-# k8s-admission-webhook [![](https://images.microbadger.com/badges/version/avastsoftware/k8s-admission-webhook.svg)](https://microbadger.com/images/avastsoftware/k8s-admission-webhook "avastsoftware/k8s-admission-webhook image @ DockerHub") [![](https://images.microbadger.com/badges/image/avastsoftware/k8s-admission-webhook.svg)](https://microbadger.com/images/avastsoftware/k8s-admission-webhook "avastsoftware/k8s-admission-webhook image @ DockerHub")
+# k8s-admission-webhook [![](https://images.microbadger.com/badges/version/avastsoftware/k8s-admission-webhook.svg)](https://microbadger.com/images/avastsoftware/k8s-admission-webhook "avastsoftware/k8s-admission-webhook image") [![](https://images.microbadger.com/badges/image/avastsoftware/k8s-admission-webhook.svg)](https://microbadger.com/images/avastsoftware/k8s-admission-webhook "avastsoftware/k8s-admission-webhook image")
 
 | Kubernetes version | v1.9              | v1.10             |
 | ------------------ |-------------------| ------------------|
 | Build status       | [![Build1][1]][3] | [![Build2][2]][3] |
 
-[1]: https://travis-matrix-badges.herokuapp.com/repos/avast/k8s-admission-webhook/branches/InitialVersion/1
-[2]: https://travis-matrix-badges.herokuapp.com/repos/avast/k8s-admission-webhook/branches/InitialVersion/2
+[1]: https://travis-matrix-badges.herokuapp.com/repos/avast/k8s-admission-webhook/branches/master/1
+[2]: https://travis-matrix-badges.herokuapp.com/repos/avast/k8s-admission-webhook/branches/master/2
 [3]: https://travis-ci.org/avast/k8s-admission-webhook
 
 A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to aid with enforcing best practices within your cluster.
