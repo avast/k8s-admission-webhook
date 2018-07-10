@@ -1,0 +1,17 @@
+language: generic
+
+sudo: required
+
+services:
+  - docker
+
+env:
+  - KUBERNETES_VERSION=1.9
+  - KUBERNETES_VERSION=1.10
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce wget openssl
+
+script:
+  - make ci-e2e-test KUBERNETES_VERSION=${KUBERNETES_VERSION}

@@ -1,0 +1,21 @@
+package: github.com/avast/k8s-admission-webhook
+import:
+- package: k8s.io/api
+  subpackages:
+  - admissionregistration/v1beta1
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/apis/meta/v1
+  - pkg/types
+  - pkg/watch
+- package: k8s.io/client-go
+  version: 8.0.0
+  subpackages:
+  - kubernetes/scheme
+  - rest
+- package: github.com/spf13/cobra
+  version: 0.0.3
+- package: github.com/spf13/viper
+  version: 1.0.2
+- package: github.com/sirupsen/logrus
+  version: 1.0.5
