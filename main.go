@@ -43,15 +43,15 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		log.Debugf("Admitting deployment: %+v", deployment)
 
 		var containerMsg string
-		var resourcesValidationError = false
 		checkResourceIsSet := func(resList corev1.ResourceList, name corev1.ResourceName, enabled bool, message string) {
 			if enabled && !isResourceSet(resList, name) {
-				resourcesValidationError = true
 				containerMsg = containerMsg + message + " "
 			}
 		}
 
 		for _, container := range deployment.Spec.Template.Spec.Containers {
+			containerMsg = ""
+
 			checkResourceIsSet(container.Resources.Limits, corev1.ResourceCPU,
 				config.RuleResourceLimitCPURequired, config.RuleResourceLimitCPURequiredMessage)
 			checkResourceIsSet(container.Resources.Limits, corev1.ResourceMemory,
@@ -61,7 +61,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 			checkResourceIsSet(container.Resources.Requests, corev1.ResourceMemory,
 				config.RuleResourceRequestMemoryRequired, config.RuleResourceRequestMemoryRequiredMessage)
 
-			if resourcesValidationError {
+			if containerMsg != "" {
 				reviewResponse.Allowed = false
 				validationMsg = fmt.Sprintf("%s Container '%s' validation errors: %s", validationMsg, container.Name, containerMsg)
 			}
