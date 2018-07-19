@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: sleep
+  name: sleep-complete
   namespace: test
 spec:
   replicas: 1

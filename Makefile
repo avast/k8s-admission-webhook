@@ -8,10 +8,12 @@ dev-start: setup-test-cluster
 dev-stop: cleanup-test-cluster cleanup-test-registry
 
 dev-e2e-test: deploy-webhook-for-test
-	export PATH=~/.kubeadm-dind-cluster:$$PATH && \
-	  go test -tags=e2e
+	KUBECTL=$(KUBECTL) go test -tags=e2e
 
-ci-e2e-test: setup-test-cluster dev-e2e-test
+ci-e2e-test: setup-test-cluster deploy-webhook-for-test
+	sleep 20 && \
+	  $(KUBECTL) describe deployment k8s-admission-webhook --namespace=default && \
+	  KUBECTL=$(KUBECTL) go test -tags=e2e
 
 apply-webhook:
 	@$(KUBECTL) delete deployment k8s-admission-webhook || true
