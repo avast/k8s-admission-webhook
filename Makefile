@@ -8,7 +8,8 @@ dev-start: setup-test-cluster
 dev-stop: cleanup-test-cluster cleanup-test-registry
 
 dev-e2e-test: deploy-webhook-for-test
-	echo "TODO"
+	export PATH=~/.kubeadm-dind-cluster:$$PATH && \
+	  go test -tags=e2e
 
 ci-e2e-test: setup-test-cluster dev-e2e-test
 

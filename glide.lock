@@ -1,5 +1,5 @@
-hash: 5b38afb3335d0f5d34f6f907d429468bcb643efe525c5dd2151ad6799bdadadf
-updated: 2018-07-07T23:09:52.333437952+02:00
+hash: 0b2a04694ff742e778881022d5406e19e96564e632b217748e0b0b33082a84ea
+updated: 2018-07-18T22:34:14.754227898+02:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
@@ -33,7 +33,7 @@ imports:
 - name: github.com/magiconair/properties
   version: c2353362d570a7bfa228149c62842019201cfb71
 - name: github.com/mitchellh/mapstructure
-  version: bb74f1db0675b241733089d5a1faa5dd8b0ef57b
+  version: f15292f7a699fcc1a38a80977f80a046874ba8ac
 - name: github.com/modern-go/concurrent
   version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
 - name: github.com/modern-go/reflect2
@@ -56,8 +56,12 @@ imports:
   version: 3ebe029320b2676d667ae88da602a5f854788a8a
 - name: github.com/spf13/viper
   version: b5e8006cbee93ec955a89ab31e0e3ce3204f3736
+- name: github.com/stretchr/testify
+  version: f35b8ab0b5a2cef36673838d662e249dd9c94686
+  subpackages:
+  - assert
 - name: golang.org/x/crypto
-  version: a49355c7e3f8fe157a85be2f77e6e269a0f89602
+  version: a2144134853fc9a27a7b1e3eb4f19f1a76df13c9
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
@@ -68,7 +72,7 @@ imports:
   - idna
   - lex/httplex
 - name: golang.org/x/sys
-  version: 3c6ecd8f22c6f40fbeec94c000a069d7d87c7624
+  version: ac767d655b305d4e9612f5f6e33120b9176c4ad4
   subpackages:
   - unix
   - windows
@@ -84,7 +88,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
 - name: k8s.io/api
-  version: 5f0d8f067e3bc465077d0333e891450326a577a3
+  version: 183f3326a9353bd6d41430fc80f96259331d029c
   subpackages:
   - admission/v1beta1
   - admissionregistration/v1beta1
@@ -92,7 +96,7 @@ imports:
   - authentication/v1
   - core/v1
 - name: k8s.io/apimachinery
-  version: cce7a330881575ce32ac9f50852de77237194a55
+  version: 241e268dc8e07223510442ab7d7902695c585d80
   subpackages:
   - pkg/api/resource
   - pkg/apis/meta/v1
@@ -114,6 +118,7 @@ imports:
   - pkg/util/framer
   - pkg/util/intstr
   - pkg/util/json
+  - pkg/util/naming
   - pkg/util/net
   - pkg/util/runtime
   - pkg/util/sets
@@ -128,4 +133,12 @@ imports:
   subpackages:
   - kubernetes/scheme
   - rest
-testImports: []
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 782f4967f2dc4564575ca782fe2d04090b5faca8
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
