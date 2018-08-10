@@ -37,7 +37,7 @@ func validateContainerResources(validation *objectValidation, targetDesc string,
 func validateResourceIsSet(violationSet *validationViolationSet, targetDesc string, resList corev1.ResourceList,
 	listName string, name corev1.ResourceName, enabled bool) {
 	if enabled && !isResourceSet(resList, name) {
-		msg := fmt.Sprintf("'%s' resource %s must be specified", name, listName)
+		msg := fmt.Sprintf("'%s' resource %s must be specified.", name, listName)
 		violationSet.add(validationViolation{targetDesc, msg})
 	}
 }
@@ -67,7 +67,7 @@ func (violationSet *validationViolationSet) message() string {
 			targetDescs = append(targetDescs, v.TargetDesc)
 			m[v.TargetDesc] = ""
 		}
-		m[v.TargetDesc] = strings.TrimSpace(fmt.Sprintf("%s %s.", m[v.TargetDesc], v.Message))
+		m[v.TargetDesc] = strings.TrimSpace(fmt.Sprintf("%s %s ", m[v.TargetDesc], v.Message))
 	}
 
 	var message = ""
