@@ -27,18 +27,15 @@ The webhook application can be configured using the flags outlined below.
 Note that every option can also be specified via an environment variable: environment variables should upper-case, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
 
 ```
---listen-port int32                                      Port to listen on. (default 443)
---no-tls                                                 Do not use TLS.
---rule-resource-limit-cpu-required                       Whether 'cpu' limit is required in resource specifications.
---rule-resource-limit-cpu-required-message string        Message returned when no 'cpu' resource limit is specified. (default "'cpu' resource limit must be specified.")
---rule-resource-limit-memory-required                    Whether 'memory' limit is required in resource specifications.
---rule-resource-limit-memory-required-message string     Message returned when no 'memory' resource limit is specified. (default "'memory' resource limit must be specified.")
---rule-resource-request-cpu-required                     Whether 'cpu' request is required in resource specifications.
---rule-resource-request-cpu-required-message string      Message returned when no 'cpu' resource request is specified. (default "'cpu' resource request must be specified.")
---rule-resource-request-memory-required                  Whether 'memory' request is required in resource specifications.
---rule-resource-request-memory-required-message string   Message returned when no 'memory' resource request is specified. (default "'memory' resource request must be specified.")
---tls-cert-file string                                   Path to the certificate file. Required, unless --no-tls is set.
---tls-private-key-file string                            Path to the certificate key file. Required, unless --no-tls is set.
+--listen-port int32                        Port to listen on. (default 443)
+--no-tls                                   Do not use TLS.
+--rule-resource-limit-cpu-required         Whether 'cpu' limit is required in resource specifications.
+--rule-resource-limit-memory-required      Whether 'memory' limit is required in resource specifications.
+--rule-resource-request-cpu-required       Whether 'cpu' request is required in resource specifications.
+--rule-resource-request-memory-required    Whether 'memory' request is required in resource specifications.
+--rule-resource-violation-message string   Additional message to be included whenever any of the resource-related rules are violated.
+--tls-cert-file string                     Path to the certificate file. Required, unless --no-tls is set.
+--tls-private-key-file string              Path to the certificate key file. Required, unless --no-tls is set.
 ```
 
 ## Installation

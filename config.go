@@ -37,7 +37,7 @@ func initialize() config {
 	rootCmd.Flags().Int32("listen-port", 443,
 		"Port to listen on.")
 	rootCmd.Flags().String("rule-resource-violation-message", "",
-		"Additional message to be included whenever any of the resource-related rule is violated.")
+		"Additional message to be included whenever any of the resource-related rules are violated.")
 	rootCmd.Flags().Bool("rule-resource-limit-cpu-required", false,
 		"Whether 'cpu' limit is required in resource specifications.")
 	rootCmd.Flags().Bool("rule-resource-limit-memory-required", false,
