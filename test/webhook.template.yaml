@@ -43,6 +43,8 @@ spec:
               value: /data/ssl_keys/server-key.pem
             - name: LISTEN_PORT
               value: "8443"
+            - name: RULE_RESOURCE_VIOLATION_MESSAGE
+              value: "For more information, see https://internal.wiki/resources"
             - name: RULE_RESOURCE_LIMIT_CPU_REQUIRED
               value: "true"
             - name: RULE_RESOURCE_LIMIT_MEMORY_REQUIRED

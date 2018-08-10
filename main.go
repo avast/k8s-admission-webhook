@@ -5,30 +5,14 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
-	"strings"
 
 	"k8s.io/api/admission/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func isResourceSet(resList corev1.ResourceList, name corev1.ResourceName) bool {
-	var missing = resList == nil
-	if !missing {
-		if _, ok := resList[name]; !ok {
-			missing = true
-		}
-	}
-	return !missing
-}
-
 func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResponse {
-	reviewResponse := v1beta1.AdmissionResponse{}
-
-	var validationMsg string
-	reviewResponse.Allowed = true
-
+	validation := &objectValidation{ar.Request.Kind.Kind, nil, &validationViolationSet{}}
 	deserializer := codecs.UniversalDeserializer()
 
 	if ar.Request.Kind.Kind == "Deployment" {
@@ -41,38 +25,28 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		}
 
 		log.Debugf("Admitting deployment: %+v", deployment)
-
-		var containerMsg string
-		checkResourceIsSet := func(resList corev1.ResourceList, name corev1.ResourceName, enabled bool, message string) {
-			if enabled && !isResourceSet(resList, name) {
-				containerMsg = containerMsg + message + " "
-			}
-		}
+		validation.ObjMeta = &deployment.ObjectMeta
 
 		for _, container := range deployment.Spec.Template.Spec.Containers {
-			containerMsg = ""
+			validateContainerResources(validation, fmt.Sprintf("Container %s", container.Name), &container, config)
+		}
 
-			checkResourceIsSet(container.Resources.Limits, corev1.ResourceCPU,
-				config.RuleResourceLimitCPURequired, config.RuleResourceLimitCPURequiredMessage)
-			checkResourceIsSet(container.Resources.Limits, corev1.ResourceMemory,
-				config.RuleResourceLimitMemoryRequired, config.RuleResourceLimitMemoryRequiredMessage)
-			checkResourceIsSet(container.Resources.Requests, corev1.ResourceCPU,
-				config.RuleResourceRequestCPURequired, config.RuleResourceRequestCPURequiredMessage)
-			checkResourceIsSet(container.Resources.Requests, corev1.ResourceMemory,
-				config.RuleResourceRequestMemoryRequired, config.RuleResourceRequestMemoryRequiredMessage)
-
-			if containerMsg != "" {
-				reviewResponse.Allowed = false
-				validationMsg = fmt.Sprintf("%s Container '%s' validation errors: %s", validationMsg, container.Name, containerMsg)
-			}
+		for _, container := range deployment.Spec.Template.Spec.InitContainers {
+			validateContainerResources(validation, fmt.Sprintf("Init container %s", container.Name), &container, config)
 		}
 	} else {
 		log.Warnf("Admitted an unexpected resource: %v", ar.Request.Kind)
 	}
 
-	if !reviewResponse.Allowed {
-		reviewResponse.Result = &metav1.Status{Message: strings.TrimSpace(validationMsg)}
+	reviewResponse := v1beta1.AdmissionResponse{}
+	message := validation.message(config)
+	if len(message) > 0 {
+		reviewResponse.Allowed = false
+		reviewResponse.Result = &metav1.Status{Message: message}
+	} else {
+		reviewResponse.Allowed = true
 	}
+
 	return &reviewResponse
 }
 

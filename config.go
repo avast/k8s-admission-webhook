@@ -10,18 +10,15 @@ import (
 )
 
 type config struct {
-	NoTLS                                    bool   `mapstructure:"no-tls"`
-	TLSCertFile                              string `mapstructure:"tls-cert-file"`
-	TLSPrivateKeyFile                        string `mapstructure:"tls-private-key-file"`
-	ListenPort                               int    `mapstructure:"listen-port"`
-	RuleResourceLimitCPURequired             bool   `mapstructure:"rule-resource-limit-cpu-required"`
-	RuleResourceLimitCPURequiredMessage      string `mapstructure:"rule-resource-limit-cpu-required-message"`
-	RuleResourceLimitMemoryRequired          bool   `mapstructure:"rule-resource-limit-memory-required"`
-	RuleResourceLimitMemoryRequiredMessage   string `mapstructure:"rule-resource-limit-memory-required-message"`
-	RuleResourceRequestCPURequired           bool   `mapstructure:"rule-resource-request-cpu-required"`
-	RuleResourceRequestCPURequiredMessage    string `mapstructure:"rule-resource-request-cpu-required-message"`
-	RuleResourceRequestMemoryRequired        bool   `mapstructure:"rule-resource-request-memory-required"`
-	RuleResourceRequestMemoryRequiredMessage string `mapstructure:"rule-resource-request-memory-required-message"`
+	NoTLS                             bool   `mapstructure:"no-tls"`
+	TLSCertFile                       string `mapstructure:"tls-cert-file"`
+	TLSPrivateKeyFile                 string `mapstructure:"tls-private-key-file"`
+	ListenPort                        int    `mapstructure:"listen-port"`
+	RuleResourceViolationMessage      string `mapstructure:"rule-resource-violation-message"`
+	RuleResourceLimitCPURequired      bool   `mapstructure:"rule-resource-limit-cpu-required"`
+	RuleResourceLimitMemoryRequired   bool   `mapstructure:"rule-resource-limit-memory-required"`
+	RuleResourceRequestCPURequired    bool   `mapstructure:"rule-resource-request-cpu-required"`
+	RuleResourceRequestMemoryRequired bool   `mapstructure:"rule-resource-request-memory-required"`
 }
 
 var rootCmd = &cobra.Command{
@@ -39,22 +36,16 @@ func initialize() config {
 		"Path to the certificate key file. Required, unless --no-tls is set.")
 	rootCmd.Flags().Int32("listen-port", 443,
 		"Port to listen on.")
+	rootCmd.Flags().String("rule-resource-violation-message", "",
+		"Additional message to be included whenever any of the resource-related rule is violated.")
 	rootCmd.Flags().Bool("rule-resource-limit-cpu-required", false,
 		"Whether 'cpu' limit is required in resource specifications.")
-	rootCmd.Flags().String("rule-resource-limit-cpu-required-message",
-		"'cpu' resource limit must be specified.", "Message returned when no 'cpu' resource limit is specified.")
 	rootCmd.Flags().Bool("rule-resource-limit-memory-required", false,
 		"Whether 'memory' limit is required in resource specifications.")
-	rootCmd.Flags().String("rule-resource-limit-memory-required-message",
-		"'memory' resource limit must be specified.", "Message returned when no 'memory' resource limit is specified.")
 	rootCmd.Flags().Bool("rule-resource-request-cpu-required", false,
 		"Whether 'cpu' request is required in resource specifications.")
-	rootCmd.Flags().String("rule-resource-request-cpu-required-message",
-		"'cpu' resource request must be specified.", "Message returned when no 'cpu' resource request is specified.")
 	rootCmd.Flags().Bool("rule-resource-request-memory-required", false,
 		"Whether 'memory' request is required in resource specifications.")
-	rootCmd.Flags().String("rule-resource-request-memory-required-message",
-		"'memory' resource request must be specified.", "Message returned when no 'memory' resource request is specified.")
 
 	viper.BindPFlags(rootCmd.Flags())
 	viper.AutomaticEnv()
