@@ -11,6 +11,7 @@ go:
 env:
   - KUBERNETES_VERSION=1.9
   - KUBERNETES_VERSION=1.10
+  - KUBERNETES_VERSION=1.11
 
 before_install:
   - sudo apt-get update

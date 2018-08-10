@@ -3,6 +3,7 @@ DIND_CLUSTER_SCRIPT=dind-cluster-v$(KUBERNETES_VERSION).sh
 TEST_REGISTRY_PORT=50001
 TEST_IMAGE_NAME=localhost:$(TEST_REGISTRY_PORT)/webhook-test
 KUBECTL=~/.kubeadm-dind-cluster/kubectl
+ADMISSION_PLUGIN_LIST=Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota
 
 dev-start: setup-test-cluster
 dev-stop: cleanup-test-cluster cleanup-test-registry
@@ -31,9 +32,10 @@ apply-webhook:
 setup-test-cluster:
 	wget https://cdn.rawgit.com/kubernetes-sigs/kubeadm-dind-cluster/master/fixed/$(DIND_CLUSTER_SCRIPT) -O ./test/$(DIND_CLUSTER_SCRIPT)
 	chmod +x ./test/$(DIND_CLUSTER_SCRIPT)
-	APISERVER_admission_control=Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota \
+	export API_SERVER_ADMISSION_ARG=$$(if [ "$(KUBERNETES_VERSION)" = "1.11" ]; then echo enable_admission_plugins; else echo admission_control; fi) && \
+	  export APISERVER_$${API_SERVER_ADMISSION_ARG}=$(ADMISSION_PLUGIN_LIST) && \
 	  NUM_NODES=1 \
-	  ./test/$(DIND_CLUSTER_SCRIPT) up
+	    ./test/$(DIND_CLUSTER_SCRIPT) up
 
 cleanup-test-cluster:
 	./test/$(DIND_CLUSTER_SCRIPT) down && ./test/$(DIND_CLUSTER_SCRIPT) clean
