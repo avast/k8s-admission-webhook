@@ -27,15 +27,19 @@ The webhook application can be configured using the flags outlined below.
 Note that every option can also be specified via an environment variable: environment variables should upper-case, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
 
 ```
---listen-port int32                        Port to listen on. (default 443)
---no-tls                                   Do not use TLS.
---rule-resource-limit-cpu-required         Whether 'cpu' limit is required in resource specifications.
---rule-resource-limit-memory-required      Whether 'memory' limit is required in resource specifications.
---rule-resource-request-cpu-required       Whether 'cpu' request is required in resource specifications.
---rule-resource-request-memory-required    Whether 'memory' request is required in resource specifications.
---rule-resource-violation-message string   Additional message to be included whenever any of the resource-related rules are violated.
---tls-cert-file string                     Path to the certificate file. Required, unless --no-tls is set.
---tls-private-key-file string              Path to the certificate key file. Required, unless --no-tls is set.
+--listen-port int32                              Port to listen on. (default 443)
+--no-tls                                         Do not use TLS.
+--rule-resource-limit-cpu-must-be-nonzero        Whether 'cpu' limit in resource specifications must be a nonzero value.
+--rule-resource-limit-cpu-required               Whether 'cpu' limit in resource specifications is required.
+--rule-resource-limit-memory-must-be-nonzero     Whether 'memory' limit in resource specifications must be a nonzero value.
+--rule-resource-limit-memory-required            Whether 'memory' limit in resource specifications is required.
+--rule-resource-request-cpu-must-be-nonzero      Whether 'cpu' request in resource specifications must be a nonzero value.
+--rule-resource-request-cpu-required             Whether 'cpu' request in resource specifications is required.
+--rule-resource-request-memory-must-be-nonzero   Whether 'memory' request in resource specifications must be a nonzero value.
+--rule-resource-request-memory-required          Whether 'memory' request in resource specifications is required.
+--rule-resource-violation-message string         Additional message to be included whenever any of the resource-related rules are violated.
+--tls-cert-file string                           Path to the certificate file. Required, unless --no-tls is set.
+--tls-private-key-file string                    Path to the certificate key file. Required, unless --no-tls is set.
 ```
 
 ## Installation

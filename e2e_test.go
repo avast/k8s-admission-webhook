@@ -24,6 +24,15 @@ func TestManifests(t *testing.T) {
 				assert.Contains(t, err.Error(), "'memory' resource request must be specified")
 			}
 		})
+		t.Run("A deployment zero resource limits and requests fails", func(t *testing.T) {
+			err = applyManifest("test/manifests/sleep-deployment-invalid.yaml", true)
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), "'cpu' resource limit must be a nonzero value")
+				assert.Contains(t, err.Error(), "'memory' resource limit must be a nonzero value")
+				assert.Contains(t, err.Error(), "'cpu' resource request must be a nonzero value")
+				assert.Contains(t, err.Error(), "'memory' resource request must be a nonzero value")
+			}
+		})
 		t.Run("A deployment with resource limits and requests succeeds", func(t *testing.T) {
 			err = applyManifest("test/manifests/sleep-deployment-complete.yaml", true)
 			assert.Nil(t, err)

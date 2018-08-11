@@ -47,11 +47,19 @@ spec:
               value: "For more information, see https://internal.wiki/resources"
             - name: RULE_RESOURCE_LIMIT_CPU_REQUIRED
               value: "true"
+            - name: RULE_RESOURCE_LIMIT_CPU_MUST_BE_NONZERO
+              value: "true"
             - name: RULE_RESOURCE_LIMIT_MEMORY_REQUIRED
+              value: "true"
+            - name: RULE_RESOURCE_LIMIT_MEMORY_MUST_BE_NONZERO
               value: "true"
             - name: RULE_RESOURCE_REQUEST_CPU_REQUIRED
               value: "true"
+            - name: RULE_RESOURCE_REQUEST_CPU_MUST_BE_NONZERO
+              value: "true"
             - name: RULE_RESOURCE_REQUEST_MEMORY_REQUIRED
+              value: "true"
+            - name: RULE_RESOURCE_REQUEST_MEMORY_MUST_BE_NONZERO
               value: "true"
           volumeMounts:
             - name: ssl-certs

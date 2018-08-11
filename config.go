@@ -10,15 +10,19 @@ import (
 )
 
 type config struct {
-	NoTLS                             bool   `mapstructure:"no-tls"`
-	TLSCertFile                       string `mapstructure:"tls-cert-file"`
-	TLSPrivateKeyFile                 string `mapstructure:"tls-private-key-file"`
-	ListenPort                        int    `mapstructure:"listen-port"`
-	RuleResourceViolationMessage      string `mapstructure:"rule-resource-violation-message"`
-	RuleResourceLimitCPURequired      bool   `mapstructure:"rule-resource-limit-cpu-required"`
-	RuleResourceLimitMemoryRequired   bool   `mapstructure:"rule-resource-limit-memory-required"`
-	RuleResourceRequestCPURequired    bool   `mapstructure:"rule-resource-request-cpu-required"`
-	RuleResourceRequestMemoryRequired bool   `mapstructure:"rule-resource-request-memory-required"`
+	NoTLS                                  bool   `mapstructure:"no-tls"`
+	TLSCertFile                            string `mapstructure:"tls-cert-file"`
+	TLSPrivateKeyFile                      string `mapstructure:"tls-private-key-file"`
+	ListenPort                             int    `mapstructure:"listen-port"`
+	RuleResourceViolationMessage           string `mapstructure:"rule-resource-violation-message"`
+	RuleResourceLimitCPURequired           bool   `mapstructure:"rule-resource-limit-cpu-required"`
+	RuleResourceLimitCPUMustBeNonZero      bool   `mapstructure:"rule-resource-limit-cpu-must-be-nonzero"`
+	RuleResourceLimitMemoryRequired        bool   `mapstructure:"rule-resource-limit-memory-required"`
+	RuleResourceLimitMemoryMustBeNonZero   bool   `mapstructure:"rule-resource-limit-memory-must-be-nonzero"`
+	RuleResourceRequestCPURequired         bool   `mapstructure:"rule-resource-request-cpu-required"`
+	RuleResourceRequestCPUMustBeNonZero    bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
+	RuleResourceRequestMemoryRequired      bool   `mapstructure:"rule-resource-request-memory-required"`
+	RuleResourceRequestMemoryMustBeNonZero bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
 }
 
 var rootCmd = &cobra.Command{
@@ -39,13 +43,21 @@ func initialize() config {
 	rootCmd.Flags().String("rule-resource-violation-message", "",
 		"Additional message to be included whenever any of the resource-related rules are violated.")
 	rootCmd.Flags().Bool("rule-resource-limit-cpu-required", false,
-		"Whether 'cpu' limit is required in resource specifications.")
+		"Whether 'cpu' limit in resource specifications is required.")
+	rootCmd.Flags().Bool("rule-resource-limit-cpu-must-be-nonzero", false,
+		"Whether 'cpu' limit in resource specifications must be a nonzero value.")
 	rootCmd.Flags().Bool("rule-resource-limit-memory-required", false,
-		"Whether 'memory' limit is required in resource specifications.")
+		"Whether 'memory' limit in resource specifications is required.")
+	rootCmd.Flags().Bool("rule-resource-limit-memory-must-be-nonzero", false,
+		"Whether 'memory' limit in resource specifications must be a nonzero value.")
 	rootCmd.Flags().Bool("rule-resource-request-cpu-required", false,
-		"Whether 'cpu' request is required in resource specifications.")
+		"Whether 'cpu' request in resource specifications is required.")
+	rootCmd.Flags().Bool("rule-resource-request-cpu-must-be-nonzero", false,
+		"Whether 'cpu' request in resource specifications must be a nonzero value.")
 	rootCmd.Flags().Bool("rule-resource-request-memory-required", false,
-		"Whether 'memory' request is required in resource specifications.")
+		"Whether 'memory' request in resource specifications is required.")
+	rootCmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
+		"Whether 'memory' request in resource specifications must be a nonzero value.")
 
 	viper.BindPFlags(rootCmd.Flags())
 	viper.AutomaticEnv()

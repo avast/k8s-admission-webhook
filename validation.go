@@ -24,20 +24,28 @@ type objectValidation struct {
 }
 
 func validateContainerResources(validation *objectValidation, targetDesc string, container *corev1.Container, config *config) {
-	validateResourceIsSet(validation.ContainerResources, targetDesc,
-		container.Resources.Limits, "limit", corev1.ResourceCPU, config.RuleResourceLimitCPURequired)
-	validateResourceIsSet(validation.ContainerResources, targetDesc,
-		container.Resources.Limits, "limit", corev1.ResourceMemory, config.RuleResourceLimitMemoryRequired)
-	validateResourceIsSet(validation.ContainerResources, targetDesc,
-		container.Resources.Requests, "request", corev1.ResourceCPU, config.RuleResourceRequestCPURequired)
-	validateResourceIsSet(validation.ContainerResources, targetDesc,
-		container.Resources.Requests, "request", corev1.ResourceMemory, config.RuleResourceRequestMemoryRequired)
+	validateResource(validation.ContainerResources, targetDesc,
+		container.Resources.Limits, "limit", corev1.ResourceCPU,
+		config.RuleResourceLimitCPURequired, config.RuleResourceLimitCPUMustBeNonZero)
+	validateResource(validation.ContainerResources, targetDesc,
+		container.Resources.Limits, "limit", corev1.ResourceMemory,
+		config.RuleResourceLimitMemoryRequired, config.RuleResourceLimitMemoryMustBeNonZero)
+	validateResource(validation.ContainerResources, targetDesc,
+		container.Resources.Requests, "request", corev1.ResourceCPU,
+		config.RuleResourceRequestCPURequired, config.RuleResourceRequestCPUMustBeNonZero)
+	validateResource(validation.ContainerResources, targetDesc,
+		container.Resources.Requests, "request", corev1.ResourceMemory,
+		config.RuleResourceRequestMemoryRequired, config.RuleResourceRequestMemoryMustBeNonZero)
 }
 
-func validateResourceIsSet(violationSet *validationViolationSet, targetDesc string, resList corev1.ResourceList,
-	listName string, name corev1.ResourceName, enabled bool) {
-	if enabled && !isResourceSet(resList, name) {
+func validateResource(violationSet *validationViolationSet, targetDesc string, resList corev1.ResourceList,
+	listName string, name corev1.ResourceName, validateIsSet bool, validateIsNonZero bool) {
+	if validateIsSet && !isResourceSet(resList, name) {
 		msg := fmt.Sprintf("'%s' resource %s must be specified.", name, listName)
+		violationSet.add(validationViolation{targetDesc, msg})
+	}
+	if validateIsNonZero && !isResourceNonZero(resList, name) {
+		msg := fmt.Sprintf("'%s' resource %s must be a nonzero value.", name, listName)
 		violationSet.add(validationViolation{targetDesc, msg})
 	}
 }
@@ -50,6 +58,17 @@ func isResourceSet(resList corev1.ResourceList, name corev1.ResourceName) bool {
 		}
 	}
 	return !missing
+}
+
+func isResourceNonZero(resList corev1.ResourceList, name corev1.ResourceName) bool {
+	if resList == nil {
+		return true
+	}
+	if r, ok := resList[name]; ok {
+		return !r.IsZero()
+	} else {
+		return true
+	}
 }
 
 func (violationSet *validationViolationSet) add(violation validationViolation) {

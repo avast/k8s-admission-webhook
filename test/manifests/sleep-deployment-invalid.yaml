@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sleep-incomplete
+  namespace: test
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sleep
+    spec:
+      containers:
+      - name: sleep
+        image: tutum/curl
+        command: ["/bin/sleep","infinity"]
+        resources:
+          requests:
+            cpu: "0m"
+            memory: "0m"
+          limits:
+            cpu: "0m"
+            memory: "0m"
