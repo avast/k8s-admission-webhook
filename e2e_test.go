@@ -12,31 +12,47 @@ import (
 	"testing"
 )
 
+var shouldFailWithResourcesNotSpecifiedErrors = []string{
+	"test/manifests/sleep-deployment-incomplete.yaml",
+}
+var shouldFailWithResourcesMustBeNonZeroErrors = []string{
+	"test/manifests/sleep-deployment-zero.yaml",
+}
+var shouldSucceed = []string{
+	"test/manifests/sleep-deployment-complete.yaml",
+}
+
 func TestManifests(t *testing.T) {
 	err := applyManifest("test/manifests/namespace.yaml", false)
 	if assert.Nil(t, err) {
-		t.Run("A deployment without resource limits and requests fails", func(t *testing.T) {
-			err = applyManifest("test/manifests/sleep-deployment-incomplete.yaml", true)
-			if assert.Error(t, err) {
-				assert.Contains(t, err.Error(), "'cpu' resource limit must be specified")
-				assert.Contains(t, err.Error(), "'memory' resource limit must be specified")
-				assert.Contains(t, err.Error(), "'cpu' resource request must be specified")
-				assert.Contains(t, err.Error(), "'memory' resource request must be specified")
-			}
-		})
-		t.Run("A deployment zero resource limits and requests fails", func(t *testing.T) {
-			err = applyManifest("test/manifests/sleep-deployment-invalid.yaml", true)
-			if assert.Error(t, err) {
-				assert.Contains(t, err.Error(), "'cpu' resource limit must be a nonzero value")
-				assert.Contains(t, err.Error(), "'memory' resource limit must be a nonzero value")
-				assert.Contains(t, err.Error(), "'cpu' resource request must be a nonzero value")
-				assert.Contains(t, err.Error(), "'memory' resource request must be a nonzero value")
-			}
-		})
-		t.Run("A deployment with resource limits and requests succeeds", func(t *testing.T) {
-			err = applyManifest("test/manifests/sleep-deployment-complete.yaml", true)
-			assert.Nil(t, err)
-		})
+		for _, p := range shouldFailWithResourcesNotSpecifiedErrors {
+			t.Run(fmt.Sprintf("%s should fail because resource limits and requests are not specified", p), func(t *testing.T) {
+				err = applyManifest(p, true)
+				if assert.Error(t, err) {
+					assert.Contains(t, err.Error(), "'cpu' resource limit must be specified")
+					assert.Contains(t, err.Error(), "'memory' resource limit must be specified")
+					assert.Contains(t, err.Error(), "'cpu' resource request must be specified")
+					assert.Contains(t, err.Error(), "'memory' resource request must be specified")
+				}
+			})
+		}
+		for _, p := range shouldFailWithResourcesMustBeNonZeroErrors {
+			t.Run(fmt.Sprintf("%s should fail because resource limits and requests are set to zero", p), func(t *testing.T) {
+				err = applyManifest(p, true)
+				if assert.Error(t, err) {
+					assert.Contains(t, err.Error(), "'cpu' resource limit must be a nonzero value")
+					assert.Contains(t, err.Error(), "'memory' resource limit must be a nonzero value")
+					assert.Contains(t, err.Error(), "'cpu' resource request must be a nonzero value")
+					assert.Contains(t, err.Error(), "'memory' resource request must be a nonzero value")
+				}
+			})
+		}
+		for _, p := range shouldSucceed {
+			t.Run(fmt.Sprintf("%s should succeed", p), func(t *testing.T) {
+				err = applyManifest(p, true)
+				assert.Nil(t, err)
+			})
+		}
 	}
 }
 
