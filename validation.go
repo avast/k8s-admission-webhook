@@ -23,6 +23,15 @@ type objectValidation struct {
 	ContainerResources *validationViolationSet
 }
 
+func validatePodSpec(validation *objectValidation, podSpec *corev1.PodSpec, config *config) {
+	for _, container := range podSpec.Containers {
+		validateContainerResources(validation, fmt.Sprintf("Container %s", container.Name), &container, config)
+	}
+	for _, container := range podSpec.InitContainers {
+		validateContainerResources(validation, fmt.Sprintf("Init container %s", container.Name), &container, config)
+	}
+}
+
 func validateContainerResources(validation *objectValidation, targetDesc string, container *corev1.Container, config *config) {
 	validateResource(validation.ContainerResources, targetDesc,
 		container.Resources.Limits, "limit", corev1.ResourceCPU,

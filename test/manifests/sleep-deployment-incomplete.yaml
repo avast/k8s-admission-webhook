@@ -1,14 +1,17 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: sleep-incomplete
   namespace: test
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: sleep-incomplete
   template:
     metadata:
       labels:
-        app: sleep
+        app: sleep-incomplete
     spec:
       containers:
       - name: sleep

@@ -110,7 +110,7 @@ webhooks:
       - operations: [ "CREATE", "UPDATE" ]
         apiGroups: ["*"]
         apiVersions: ["*"]
-        resources: ["deployments"]
+        resources: ["pods", "deployments", "replicasets", "daemonsets", "jobs", "cronjobs"]
     failurePolicy: Fail
     namespaceSelector:
       matchLabels:
