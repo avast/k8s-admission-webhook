@@ -15,6 +15,14 @@ Can be set up to validate that:
 * containers have their resource limits specified (`memory`, `cpu`)
 * containers have their resource requests specified (`memory`, `cpu`)
 
+Resource spec validation operates on:
+* `Pod`s
+* `Deployment`s
+* `ReplicaSet`s
+* `DaemonSet`s
+* `Job`s
+* `CronJob`s
+
 ## Introduction
 As per [Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/), admission webhooks are
 > HTTP callbacks that receive admission requests and do something with them. You can define two types of admission webhooks, validating admission webhook and mutating admission webhook. With validating admission Webhooks, you may reject requests to enforce custom admission policies. With mutating admission Webhooks, you may change requests to enforce custom defaults.
@@ -78,7 +86,18 @@ These are some `make` targets intended to be used during local development. Note
 * `make dev-stop`: Stops the local cluster and performs additional cleanup.
 
 #### Running the end-to-end tests
-TBD
+On the CI server, end-to-end tests are run via:
+```
+make ci-e2e-test KUBERNETES_VERSION=1.9
+```
+
+Other than `1.9`, tests can currently run also against `1.10` and `1.11` (see (.travis.yml)[travis.yml]) for more details.
+
+While `ci-e2e-test` spins up the whole cluster on every run, a more convenient workflow to run end-to-end tests during
+local development is available via:
+1. `make dev-start`
+2. make changes to code + `make dev-e2e-test`, rinse and repeat
+3. `make dev-stop` (cleans up the development cluster)
 
 ### Why Glide for Go dependency management?
 This project makes use of the [official Go client for Kubernetes](https://github.com/kubernetes/client-go), which as of this writing does not support the now-standard [dep](https://github.com/golang/dep) for dependency management. This is discussed in more detail in the ["Dep (Not supported yet!)"](https://github.com/kubernetes/client-go/blob/master/INSTALL.md#dep-not-supported-yet) section of `client-go`'s installation docs, which also [suggest Glide](https://github.com/kubernetes/client-go/blob/master/INSTALL.md#glide) as a viable alternative.

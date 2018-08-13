@@ -1,0 +1,23 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cronjob-zero
+  namespace: test
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sleep
+              image: tutum/curl
+              command: ["/bin/sleep","5m"]
+              resources:
+                requests:
+                  cpu: "0m"
+                  memory: "0m"
+                limits:
+                  cpu: "0m"
+                  memory: "0m"
+          restartPolicy: Never

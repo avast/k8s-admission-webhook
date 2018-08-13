@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sleep-invalid
+  name: sleep-zero
   namespace: test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sleep-invalid
+      app: sleep-zero
   template:
     metadata:
       labels:
-        app: sleep-invalid
+        app: sleep-zero
     spec:
       containers:
       - name: sleep

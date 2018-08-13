@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-incomplete
+  namespace: test
+spec:
+  template:
+    metadata:
+      name: job-incomplete
+    spec:
+      containers:
+        - name: sleep
+          image: tutum/curl
+          command: ["/bin/sleep","5m"]
+          resources:
+            requests:
+            limits:
+      restartPolicy: Never

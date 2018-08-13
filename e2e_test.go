@@ -13,13 +13,22 @@ import (
 )
 
 var shouldFailWithResourcesNotSpecifiedErrors = []string{
-	"test/manifests/sleep-deployment-incomplete.yaml",
+	"test/manifests/deployment-incomplete.yaml",
+	"test/manifests/pod-incomplete.yaml",
+	"test/manifests/job-incomplete.yaml",
+	"test/manifests/cronjob-incomplete.yaml",
 }
 var shouldFailWithResourcesMustBeNonZeroErrors = []string{
-	"test/manifests/sleep-deployment-zero.yaml",
+	"test/manifests/deployment-zero.yaml",
+	"test/manifests/pod-zero.yaml",
+	"test/manifests/job-zero.yaml",
+	"test/manifests/cronjob-zero.yaml",
 }
 var shouldSucceed = []string{
-	"test/manifests/sleep-deployment-complete.yaml",
+	"test/manifests/deployment-complete.yaml",
+	"test/manifests/pod-complete.yaml",
+	"test/manifests/job-complete.yaml",
+	"test/manifests/cronjob-complete.yaml",
 }
 
 func TestManifests(t *testing.T) {

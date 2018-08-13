@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cronjob-incomplete
+  namespace: test
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sleep
+              image: tutum/curl
+              command: ["/bin/sleep","5m"]
+          restartPolicy: Never

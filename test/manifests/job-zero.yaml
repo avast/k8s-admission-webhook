@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-zero
+  namespace: test
+spec:
+  template:
+    metadata:
+      name: job-zero
+    spec:
+      containers:
+        - name: sleep
+          image: tutum/curl
+          command: ["/bin/sleep","5m"]
+          resources:
+            requests:
+              cpu: "0m"
+              memory: "0m"
+            limits:
+              cpu: "0m"
+              memory: "0m"
+      restartPolicy: Never
