@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: invalid-deployment-update 
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: invalid-deployment-update
+  template:
+    metadata:
+      labels:
+        app: invalid-deployment-update
+    spec:
+      containers:
+      - name: sleep
+        image: tutum/curl
+        command: ["/bin/sleep","infinity"]
+        resources:
+          requests:
+            cpu: "0m"
+            memory: "0m"
+          limits:
+            cpu: "0m"
+            memory: "0m"

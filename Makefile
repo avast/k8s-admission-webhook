@@ -8,12 +8,12 @@ dev-start: setup-test-cluster
 dev-stop: cleanup-test-cluster
 
 dev-e2e-test: deploy-webhook-for-test
-	KUBECTL=$(KUBECTL) go test -tags=e2e
+	KUBECTL=$(KUBECTL) go test -tags=e2e -p 1
 
 ci-e2e-test: setup-test-cluster deploy-webhook-for-test
 	sleep 20 && \
 	  $(KUBECTL) describe deployment k8s-admission-webhook --namespace=default && \
-	  KUBECTL=$(KUBECTL) go test -tags=e2e
+	  KUBECTL=$(KUBECTL) go test -tags=e2e -p 1
 
 apply-webhook:
 	@$(KUBECTL) delete deployment k8s-admission-webhook || true

@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 )
 
 var shouldFailWithResourcesNotSpecifiedErrors = []string{
@@ -65,30 +66,37 @@ func TestManifests(t *testing.T) {
 	}
 }
 
-func applyManifest(name string, deleteFirst bool) error {
-	kubectl := os.Getenv("KUBECTL")
-	if kubectl == "" {
-		kubectl = "kubectl"
-	}
-	if deleteFirst {
-		delete := exec.Command(kubectl, "delete", "-f", name)
-		output, err := delete.Output()
-		if err != nil {
-			if exitError, ok := err.(*exec.ExitError); ok {
-				stdErr := string(exitError.Stderr)
-				if !strings.Contains(stdErr, "NotFound") {
-					fmt.Printf("Unexpected error while deleting, stderr: %s", stdErr)
-					return errors.New(stdErr)
+func TestUpdate(t *testing.T) {
+	err := applyManifest("test/manifests/namespace.yaml", false)
+	if assert.Nil(t, err) {
+		t.Run("should allow fixing pre-existing invalid resource spec", func(t *testing.T) {
+			err = deleteManifest("test/webhook.yaml")
+			if assert.Nil(t, err, "Could not disable webhook") {
+				time.Sleep(5 * time.Second)
+				err = applyManifest("test/manifests/invalid-deployment-update-01-zero.yaml", false)
+				if assert.Nil(t, err, "Could not apply deployment-zero") {
+					err = applyManifest("test/webhook.yaml", false)
+					time.Sleep(5 * time.Second)
+					if assert.Nil(t, err) {
+						err = applyManifest("test/manifests/invalid-deployment-update-02-complete.yaml", false)
+						assert.Nil(t, err)
+					}
 				}
-			} else {
-				return err
 			}
-		} else {
-			fmt.Print(string(output))
+		})
+	}
+}
+
+func applyManifest(name string, deleteFirst bool) error {
+	if deleteFirst {
+		err := deleteManifest(name)
+		if err != nil {
+			return nil
 		}
+		time.Sleep(2 * time.Second)
 	}
 
-	apply := exec.Command(kubectl, "apply", "-f", name)
+	apply := exec.Command(kubectl(), "apply", "-f", name)
 	output, err := apply.Output()
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
@@ -101,4 +109,30 @@ func applyManifest(name string, deleteFirst bool) error {
 	}
 	fmt.Print(string(output))
 	return nil
+}
+
+func deleteManifest(name string) error {
+	delete := exec.Command(kubectl(), "delete", "-f", name)
+	output, err := delete.Output()
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			stdErr := string(exitError.Stderr)
+			if !strings.Contains(stdErr, "NotFound") {
+				fmt.Printf("Unexpected error while deleting, stderr: %s", stdErr)
+				return errors.New(stdErr)
+			}
+		} else {
+			return err
+		}
+	}
+	fmt.Print(string(output))
+	return nil
+}
+
+func kubectl() string {
+	kubectl := os.Getenv("KUBECTL")
+	if kubectl == "" {
+		kubectl = "kubectl"
+	}
+	return kubectl
 }
