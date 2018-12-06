@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-valid-1
+  namespace: test
+spec:
+  rules:
+    - host: ingress-valid-1.avast.com
+      http:
+        paths:
+          - backend:
+              serviceName: nginx
+              servicePort: 80
+  tls:
+    - hosts:
+        - ingress-valid-1.avast.com
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-valid-2
+  namespace: test
+spec:
+  rules:
+    - host: ingress-valid-2.avast.com
+      http:
+        paths:
+          - backend:
+              serviceName: nginx
+              servicePort: 80
+  tls:
+    - hosts:
+        - ingress-valid-2.avast.com

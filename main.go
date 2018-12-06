@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"net/http"
-	"os"
-
+	"github.com/sirupsen/logrus"
 	"k8s.io/api/admission/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
+	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"net/http"
+	"os"
 )
 
 func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResponse {
@@ -24,71 +24,85 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 	case "Pod":
 		pod := corev1.Pod{}
 		if _, _, err := deserializer.Decode(raw, nil, &pod); err != nil {
-			log.Error(err)
+			logger.Error(err)
 			return toAdmissionResponse(err)
 		}
 
-		log.Debug("Admitting Pod: %+v", pod)
+		logger.Debugf("Admitting Pod: %+v", pod)
 		validation.ObjMeta = &pod.ObjectMeta
 		validatePodSpec(validation, &pod.Spec, config)
 
 	case "ReplicaSet":
 		replicaSet := appsv1.ReplicaSet{}
 		if _, _, err := deserializer.Decode(raw, nil, &replicaSet); err != nil {
-			log.Error(err)
+			logger.Error(err)
 			return toAdmissionResponse(err)
 		}
 
-		log.Debug("Admitting ReplicaSet: %+v", replicaSet)
+		logger.Debugf("Admitting ReplicaSet: %+v", replicaSet)
 		validation.ObjMeta = &replicaSet.ObjectMeta
 		validatePodSpec(validation, &replicaSet.Spec.Template.Spec, config)
 
 	case "Deployment":
 		deployment := appsv1.Deployment{}
 		if _, _, err := deserializer.Decode(raw, nil, &deployment); err != nil {
-			log.Error(err)
+			logger.Error(err)
 			return toAdmissionResponse(err)
 		}
 
-		log.Debugf("Admitting deployment: %+v", deployment)
+		logger.Debugf("Admitting deployment: %+v", deployment)
 		validation.ObjMeta = &deployment.ObjectMeta
 		validatePodSpec(validation, &deployment.Spec.Template.Spec, config)
 
 	case "DaemonSet":
 		daemonSet := appsv1.DaemonSet{}
 		if _, _, err := deserializer.Decode(raw, nil, &daemonSet); err != nil {
-			log.Error(err)
+			logger.Error(err)
 			return toAdmissionResponse(err)
 		}
 
-		log.Debug("Admitting DaemonSet: %+v", daemonSet)
+		logger.Debugf("Admitting DaemonSet: %+v", daemonSet)
 		validation.ObjMeta = &daemonSet.ObjectMeta
 		validatePodSpec(validation, &daemonSet.Spec.Template.Spec, config)
 
 	case "Job":
 		job := batchv1.Job{}
 		if _, _, err := deserializer.Decode(raw, nil, &job); err != nil {
-			log.Error(err)
+			logger.Error(err)
 			return toAdmissionResponse(err)
 		}
 
-		log.Debug("Admitting Job: %+v", job)
+		logger.Debugf("Admitting Job: %+v", job)
 		validation.ObjMeta = &job.ObjectMeta
 		validatePodSpec(validation, &job.Spec.Template.Spec, config)
 
 	case "CronJob":
 		cronJob := batchv1beta1.CronJob{}
 		if _, _, err := deserializer.Decode(raw, nil, &cronJob); err != nil {
-			log.Error(err)
+			logger.Error(err)
 			return toAdmissionResponse(err)
 		}
 
-		log.Debug("Admitting CronJob: %+v", cronJob)
+		logger.Debugf("Admitting CronJob: %+v", cronJob)
 		validation.ObjMeta = &cronJob.ObjectMeta
 		validatePodSpec(validation, &cronJob.Spec.JobTemplate.Spec.Template.Spec, config)
 
+	case "Ingress":
+		ingress := extv1beta1.Ingress{}
+		if _, _, err := deserializer.Decode(raw, nil, &ingress); err != nil {
+			logger.Error(err)
+			return toAdmissionResponse(err)
+		}
+
+		logger.Debugf("Admitting Ingress: %+v", ingress)
+		validation.ObjMeta = &ingress.ObjectMeta
+		err := validateIngress(validation, &ingress, config)
+		if err != nil {
+			return toAdmissionResponse(err)
+		}
+
 	default:
-		log.Warnf("Admitted an unexpected resource: %v", ar.Request.Kind)
+		logger.Warnf("Admitted an unexpected resource: %v", ar.Request.Kind)
 	}
 
 	reviewResponse := v1beta1.AdmissionResponse{}
@@ -103,13 +117,15 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 	return &reviewResponse
 }
 
+var logger *logrus.Logger
+
 func main() {
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.DebugLevel)
+	config := initialize()
+	initLogger()
+	initKubeClientSet()
 
 	// parse and validate arguments
-	config := initialize()
-	log.Debugf("Configuration is: %+v", config)
+	logger.Debugf("Configuration is: %+v", config)
 
 	http.HandleFunc("/validate", admitFunc(validate).serve(&config))
 	addr := fmt.Sprintf(":%v", config.ListenPort)
@@ -117,12 +133,18 @@ func main() {
 	var err error
 
 	if config.NoTLS {
-		log.Infof("Starting webserver at %v (no TLS)", addr)
+		logger.Infof("Starting webserver at %v (no TLS)", addr)
 		err = http.ListenAndServe(addr, nil)
 	} else {
-		log.Infof("Starting webserver at %v (TLS)", addr)
+		logger.Infof("Starting webserver at %v (TLS)", addr)
 		err = http.ListenAndServeTLS(addr, config.TLSCertFile, config.TLSPrivateKeyFile, nil)
 	}
 
-	log.Fatal(err)
+	logger.Fatal(err)
+}
+
+func initLogger() {
+	logger = logrus.New()
+	logger.SetOutput(os.Stdout)
+	logger.SetLevel(logrus.DebugLevel)
 }

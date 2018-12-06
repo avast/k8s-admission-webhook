@@ -23,6 +23,8 @@ type config struct {
 	RuleResourceRequestCPUMustBeNonZero    bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
 	RuleResourceRequestMemoryRequired      bool   `mapstructure:"rule-resource-request-memory-required"`
 	RuleResourceRequestMemoryMustBeNonZero bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
+	RuleIngressRegex                       bool   `mapstructure:"rule-ingress-regex"`
+	RuleIngressCollision                   bool   `mapstructure:"rule-ingress-collision"`
 }
 
 var rootCmd = &cobra.Command{
@@ -58,8 +60,12 @@ func initialize() config {
 		"Whether 'memory' request in resource specifications is required.")
 	rootCmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
 		"Whether 'memory' request in resource specifications must be a nonzero value.")
+	rootCmd.Flags().Bool("rule-ingress-collision", false,
+		"Whether ingress tls and host collision should be checked")
+	rootCmd.Flags().Bool("rule-ingress-regex", false,
+		"Whether ingress host and path regex should be matched")
 
-	viper.BindPFlags(rootCmd.Flags())
+	_ = viper.BindPFlags(rootCmd.Flags())
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
@@ -69,10 +75,10 @@ func initialize() config {
 	}
 
 	c := config{}
-	viper.Unmarshal(&c)
+	_ = viper.Unmarshal(&c)
 	if !c.NoTLS && (c.TLSPrivateKeyFile == "" || c.TLSCertFile == "") {
-		fmt.Println("Both --tls-cert-file and --tls-private-key-file are required (unless TLS is disabled by setting --no-tls)")
-		rootCmd.Usage()
+		_, _ = os.Stderr.WriteString("Both --tls-cert-file and --tls-private-key-file are required (unless TLS is disabled by setting --no-tls)\n\n")
+		_ = rootCmd.Usage()
 		os.Exit(1)
 	}
 
