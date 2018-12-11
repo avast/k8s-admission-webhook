@@ -23,7 +23,6 @@ type config struct {
 	RuleResourceRequestCPUMustBeNonZero    bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
 	RuleResourceRequestMemoryRequired      bool   `mapstructure:"rule-resource-request-memory-required"`
 	RuleResourceRequestMemoryMustBeNonZero bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
-	RuleIngressRegex                       bool   `mapstructure:"rule-ingress-regex"`
 	RuleIngressCollision                   bool   `mapstructure:"rule-ingress-collision"`
 }
 
@@ -62,8 +61,6 @@ func initialize() config {
 		"Whether 'memory' request in resource specifications must be a nonzero value.")
 	rootCmd.Flags().Bool("rule-ingress-collision", false,
 		"Whether ingress tls and host collision should be checked")
-	rootCmd.Flags().Bool("rule-ingress-regex", false,
-		"Whether ingress host and path regex should be matched")
 
 	_ = viper.BindPFlags(rootCmd.Flags())
 	viper.AutomaticEnv()

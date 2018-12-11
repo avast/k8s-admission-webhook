@@ -61,6 +61,8 @@ spec:
               value: "true"
             - name: RULE_RESOURCE_REQUEST_MEMORY_MUST_BE_NONZERO
               value: "true"
+            - name: RULE_INGRESS_COLLISION
+              value: "true"
           volumeMounts:
             - name: ssl-certs
               mountPath: "/data/ssl_certs"

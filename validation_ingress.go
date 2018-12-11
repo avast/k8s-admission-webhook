@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var ingressHostRegExp = regexp.MustCompile(`^(([a-zA-Z])|([a-zA-Z][a-zA-Z])|([a-zA-Z][0-9])|([0-9][a-zA-Z])|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\.[a-zA-Z]{2,3})$`)
+var ingressHostRegExp = regexp.MustCompile(`^([a-zA-Z0-9_][a-zA-Z0-9_-]{0,62})(\.[a-zA-Z0-9_][a-zA-Z0-9_-]{0,62})*[._]?$`)
 var ingressPathRegExp = regexp.MustCompile(`^[A-zA-Z0-9_/.\-]*$`)
 
 type TlsDefinition struct {
@@ -19,10 +19,12 @@ type TlsDefinition struct {
 }
 
 type PathDefinition struct {
-	host        string
-	path        string
-	serviceName string
-	servicePort string
+	host             string
+	path             string
+	serviceName      string
+	servicePort      string
+	ingressName      string
+	ingressNamespace string
 }
 
 func (pathDefinition *PathDefinition) toUri() string {
@@ -31,23 +33,21 @@ func (pathDefinition *PathDefinition) toUri() string {
 
 func validateIngress(validation *objectValidation, ingress *extv1beta1.Ingress, config *config) error {
 
-	targetDesc := fmt.Sprintf("Ingress %s", ingress.Name)
+	targetDesc := fmt.Sprintf("Ingress %s.%s: ", ingress.Name, ingress.Namespace)
 
 	remoteIngresses, err := ingressClient().List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
-	logger.Debugf("There are %d ingresses in the cluster\n", len(remoteIngresses.Items))
+	logger.Debugf("There are %d ingresses in the cluster", len(remoteIngresses.Items))
 
 	localPathData := ingressPath(ingress)
 	localTlsData := ingressTls(ingress)
 
-	if config.RuleIngressRegex {
+	if config.RuleIngressCollision {
 		validatePathDataRegex(localPathData, validation, targetDesc)
 		validateTlsDataRegex(localTlsData, validation, targetDesc)
-	}
 
-	if config.RuleIngressCollision {
 		var remotePathData []PathDefinition
 		for _, remoteIngress := range remoteIngresses.Items {
 			remotePathData = append(remotePathData, ingressPath(&remoteIngress)...)
@@ -73,12 +73,12 @@ func validateTlsDataCollision(localTlsData []TlsDefinition, remoteTlsData []TlsD
 	for _, localTls := range localTlsData {
 		for _, remoteTls := range remoteTlsData {
 			if localTls.host == remoteTls.host {
-				//if hosts are identical rest also has to be identical
-				if localTls != remoteTls {
+				//if hosts are identical then also secret name and namespace has to match
+				if !(localTls.ingressNamespace == remoteTls.ingressNamespace && localTls.secretName == remoteTls.secretName) {
 					addViolation(
 						validation,
 						targetDesc,
-						fmt.Sprintf("TLS collision with `%s.%s` on `%s`", remoteTls.ingressName, remoteTls.ingressNamespace, remoteTls.host),
+						fmt.Sprintf("TLS collision with '%s.%s' on '%s'", remoteTls.ingressName, remoteTls.ingressNamespace, remoteTls.host),
 					)
 				}
 			}
@@ -96,13 +96,14 @@ func validatePathDataRegex(localPathData []PathDefinition, validation *objectVal
 func validatePathDataCollision(localPathData []PathDefinition, remotePathData []PathDefinition, validation *objectValidation, targetDesc string) {
 	for _, localPath := range localPathData {
 		for _, remotePath := range remotePathData {
-			if localPath == remotePath {
-				logger.Info(remotePath)
-				violation := validationViolation{
-					targetDesc,
-					fmt.Sprintf("Path collision with `%s` -> `%s:%s`", remotePath.toUri(), remotePath.serviceName, remotePath.servicePort),
+			if localPath.toUri() == remotePath.toUri() {
+				if localPath != remotePath {
+					violation := validationViolation{
+						targetDesc,
+						fmt.Sprintf("Path collision with '%s' -> '%s:%s'", remotePath.toUri(), remotePath.serviceName, remotePath.servicePort),
+					}
+					validation.Violations.add(violation)
 				}
-				validation.Violations.add(violation)
 			}
 		}
 	}
@@ -114,15 +115,17 @@ func ingressPath(ingress *extv1beta1.Ingress) (result []PathDefinition) {
 		if rule.HTTP != nil {
 			for _, path := range rule.HTTP.Paths {
 				pathDefinition := PathDefinition{
-					host:        host,
-					path:        path.Path,
-					serviceName: path.Backend.ServiceName,
-					servicePort: path.Backend.ServicePort.String(),
+					host:             host,
+					path:             path.Path,
+					serviceName:      path.Backend.ServiceName,
+					servicePort:      path.Backend.ServicePort.String(),
+					ingressName:      ingress.Name,
+					ingressNamespace: ingress.Namespace,
 				}
 				result = append(result, pathDefinition)
 			}
 		} else {
-			logger.Warnf("No http definition for %v", ingress)
+			logger.Warnf("No http definition for %s.%s in rule %v", ingress.Name, ingress.Namespace, rule)
 		}
 	}
 	return
@@ -140,15 +143,19 @@ func ingressTls(ingress *extv1beta1.Ingress) (result []TlsDefinition) {
 
 func validateHost(host string, validation *objectValidation, targetDesc string) {
 	if !ingressHostRegExp.MatchString(host) {
-		addViolation(validation, targetDesc, fmt.Sprintf("Host `%s` is not valid", host))
+		addViolation(validation, targetDesc, fmt.Sprintf("Host '%s' is not valid", host))
 	}
 }
 
 func validatePath(path string, validation *objectValidation, targetDesc string) {
-	valid := strings.HasPrefix(path, "/")
-	valid = valid && ingressPathRegExp.MatchString(path)
-	if !valid {
-		addViolation(validation, targetDesc, fmt.Sprintf("Path `%s` is not valid", path))
+	if path == "" {
+		return
+	} else {
+		valid := strings.HasPrefix(path, "/")
+		valid = valid && ingressPathRegExp.MatchString(path)
+		if !valid {
+			addViolation(validation, targetDesc, fmt.Sprintf("Path '%s' is not valid", path))
+		}
 	}
 }
 

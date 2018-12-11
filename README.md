@@ -23,6 +23,9 @@ Resource spec validation operates on:
 * `Job`s
 * `CronJob`s
 
+Host and path validation operates on:
+* `Ingress`es
+
 ## Introduction
 As per [Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/), admission webhooks are
 > HTTP callbacks that receive admission requests and do something with them. You can define two types of admission webhooks, validating admission webhook and mutating admission webhook. With validating admission Webhooks, you may reject requests to enforce custom admission policies. With mutating admission Webhooks, you may change requests to enforce custom defaults.
@@ -45,7 +48,8 @@ Note that every option can also be specified via an environment variable: enviro
 --rule-resource-request-cpu-required             Whether 'cpu' request in resource specifications is required.
 --rule-resource-request-memory-must-be-nonzero   Whether 'memory' request in resource specifications must be a nonzero value.
 --rule-resource-request-memory-required          Whether 'memory' request in resource specifications is required.
---rule-resource-violation-message string         Additional message to be included whenever any of the resource-related rules are violated.
+--rule-resource-violation-message                Additional message to be included whenever any of the resource-related rules are violated.
+--rule-ingress-collision                         Whether ingress tls and host collision should be checked 
 --tls-cert-file string                           Path to the certificate file. Required, unless --no-tls is set.
 --tls-private-key-file string                    Path to the certificate key file. Required, unless --no-tls is set.
 ```

@@ -110,7 +110,7 @@ func (validation *objectValidation) message(config *config) string {
 
 	containerResourcesViolationMessage := validation.Violations.message()
 	if len(containerResourcesViolationMessage) > 0 {
-		message = fmt.Sprintf("One or more container resource specifications are invalid: [%s]", containerResourcesViolationMessage)
+		message = fmt.Sprintf("One or more specifications are invalid: [%s]", containerResourcesViolationMessage)
 		if len(config.RuleResourceViolationMessage) > 0 {
 			message = fmt.Sprintf("%s %s", message, config.RuleResourceViolationMessage)
 		}
