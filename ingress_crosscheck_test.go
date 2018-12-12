@@ -8,6 +8,16 @@ import (
 	"testing"
 )
 
+/*
+
+This tests loads all ingress definitions and performs the check for all of
+them to find collisions in the current kubernetes cluster.
+
+Current .kube/config context is used to initialize the kubernetes client.
+
+This should not be part of any automated tests. It's meant to be executed manually when needed.
+
+*/
 func TestClusterCollisions(t *testing.T) {
 	initLogger()
 	initKubeClientSet(false)
