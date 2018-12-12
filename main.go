@@ -96,7 +96,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 
 		logger.Debugf("Admitting Ingress: %+v", ingress)
 		validation.ObjMeta = &ingress.ObjectMeta
-		err := validateIngress(validation, &ingress, config)
+		err := ValidateIngress(validation, &ingress, config)
 		if err != nil {
 			return toAdmissionResponse(err)
 		}

@@ -10,10 +10,13 @@ import (
 func TestIngressE2E(t *testing.T) {
 	t.Run("Reject", func(t *testing.T) {
 		err := applyManifest("test/manifests/ingress-valid.yaml", true)
-		if assert.Nil(t, err) {
+		if assert.Nil(t, err, "ingress-valid.yaml should be applied") {
 			err := applyManifest("test/manifests/ingress-collision-tls.yaml", true)
-			assert.NotNil(t, err)
+			assert.Error(t, err, "ingress-collision-tls.yaml should not be applied")
+			err = applyManifest("test/manifests/ingress-collision-path.yaml", true)
+			assert.Error(t, err, "ingress-collision-path.yaml should not be applied")
 		}
+
 	})
 
 	t.Run("Success", func(t *testing.T) {
@@ -21,7 +24,7 @@ func TestIngressE2E(t *testing.T) {
 		if assert.Nil(t, err) {
 			err := applyManifest("test/manifests/ingress-valid.yaml", true)
 			if assert.Nil(t, err) {
-				err := applyManifest("test/manifests/ingress-no-collision-tls.yaml", true)
+				err := applyManifest("test/manifests/ingress-no-collision.yaml", true)
 				assert.Nil(t, err)
 			}
 		}

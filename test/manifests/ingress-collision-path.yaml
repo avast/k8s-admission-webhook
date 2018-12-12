@@ -5,14 +5,13 @@ metadata:
   namespace: test
 spec:
   rules:
-    - host: ingress-collision-1.avast.com
+    - host: ingress-valid-1.avast.com
       http:
         paths:
           - backend:
               serviceName: nginx
-              servicePort: 80
+              servicePort: 8080
             path: /
   tls:
-    - secretName: "notDefault"
-      hosts:
+    - hosts:
         - ingress-valid-1.avast.com

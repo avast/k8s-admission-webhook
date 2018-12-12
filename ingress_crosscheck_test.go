@@ -20,7 +20,7 @@ func TestClusterCollisions(t *testing.T) {
 
 				validation := &objectValidation{ingress.Kind, nil, &validationViolationSet{}}
 				config := &config{RuleIngressCollision: true}
-				err := validateIngress(validation, &ingress, config)
+				err := ValidateIngress(validation, &ingress, config)
 				if assert.Nil(t, err) {
 					assert.Len(t, validation.Violations.Violations, 0)
 				}
