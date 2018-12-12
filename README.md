@@ -14,6 +14,10 @@ A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/refe
 Can be set up to validate that:
 * containers have their resource limits specified (`memory`, `cpu`)
 * containers have their resource requests specified (`memory`, `cpu`)
+* ingress rules hosts and paths match regex
+* ingress rules hosts and paths are not in collision with definitions already in the cluster
+* ingress tls hosts match regex
+* ingress tls hosts are not in collision with definitions already in the cluster
 
 Resource spec validation operates on:
 * `Pod`s
@@ -50,6 +54,7 @@ Note that every option can also be specified via an environment variable: enviro
 --rule-resource-request-memory-required          Whether 'memory' request in resource specifications is required.
 --rule-resource-violation-message                Additional message to be included whenever any of the resource-related rules are violated.
 --rule-ingress-collision                         Whether ingress tls and host collision should be checked 
+--rule-ingress-violation-message                 Additional message to be included whenever any of the ingress-related rules are violated.
 --tls-cert-file string                           Path to the certificate file. Required, unless --no-tls is set.
 --tls-private-key-file string                    Path to the certificate key file. Required, unless --no-tls is set.
 ```

@@ -19,9 +19,10 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 	deserializer := codecs.UniversalDeserializer()
 
 	raw := ar.Request.Object.Raw
-
+	var configMessage string
 	switch ar.Request.Kind.Kind {
 	case "Pod":
+		configMessage = config.RuleResourceViolationMessage
 		pod := corev1.Pod{}
 		if _, _, err := deserializer.Decode(raw, nil, &pod); err != nil {
 			logger.Error(err)
@@ -33,6 +34,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		validatePodSpec(validation, &pod.Spec, config)
 
 	case "ReplicaSet":
+		configMessage = config.RuleResourceViolationMessage
 		replicaSet := appsv1.ReplicaSet{}
 		if _, _, err := deserializer.Decode(raw, nil, &replicaSet); err != nil {
 			logger.Error(err)
@@ -44,6 +46,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		validatePodSpec(validation, &replicaSet.Spec.Template.Spec, config)
 
 	case "Deployment":
+		configMessage = config.RuleResourceViolationMessage
 		deployment := appsv1.Deployment{}
 		if _, _, err := deserializer.Decode(raw, nil, &deployment); err != nil {
 			logger.Error(err)
@@ -55,6 +58,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		validatePodSpec(validation, &deployment.Spec.Template.Spec, config)
 
 	case "DaemonSet":
+		configMessage = config.RuleResourceViolationMessage
 		daemonSet := appsv1.DaemonSet{}
 		if _, _, err := deserializer.Decode(raw, nil, &daemonSet); err != nil {
 			logger.Error(err)
@@ -66,6 +70,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		validatePodSpec(validation, &daemonSet.Spec.Template.Spec, config)
 
 	case "Job":
+		configMessage = config.RuleResourceViolationMessage
 		job := batchv1.Job{}
 		if _, _, err := deserializer.Decode(raw, nil, &job); err != nil {
 			logger.Error(err)
@@ -77,6 +82,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		validatePodSpec(validation, &job.Spec.Template.Spec, config)
 
 	case "CronJob":
+		configMessage = config.RuleResourceViolationMessage
 		cronJob := batchv1beta1.CronJob{}
 		if _, _, err := deserializer.Decode(raw, nil, &cronJob); err != nil {
 			logger.Error(err)
@@ -88,6 +94,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 		validatePodSpec(validation, &cronJob.Spec.JobTemplate.Spec.Template.Spec, config)
 
 	case "Ingress":
+		configMessage = config.RuleIngressViolationMessage
 		ingress := extv1beta1.Ingress{}
 		if _, _, err := deserializer.Decode(raw, nil, &ingress); err != nil {
 			logger.Error(err)
@@ -106,7 +113,8 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 	}
 
 	reviewResponse := v1beta1.AdmissionResponse{}
-	message := validation.message(config)
+
+	message := validation.message(configMessage)
 	if len(message) > 0 {
 		reviewResponse.Allowed = false
 		reviewResponse.Result = &metav1.Status{Message: message}

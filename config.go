@@ -24,6 +24,7 @@ type config struct {
 	RuleResourceRequestMemoryRequired      bool   `mapstructure:"rule-resource-request-memory-required"`
 	RuleResourceRequestMemoryMustBeNonZero bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
 	RuleIngressCollision                   bool   `mapstructure:"rule-ingress-collision"`
+	RuleIngressViolationMessage            string `mapstructure:"rule-ingress-violation-message"`
 }
 
 var rootCmd = &cobra.Command{
@@ -41,6 +42,7 @@ func initialize() config {
 		"Path to the certificate key file. Required, unless --no-tls is set.")
 	rootCmd.Flags().Int32("listen-port", 443,
 		"Port to listen on.")
+	//resources
 	rootCmd.Flags().String("rule-resource-violation-message", "",
 		"Additional message to be included whenever any of the resource-related rules are violated.")
 	rootCmd.Flags().Bool("rule-resource-limit-cpu-required", false,
@@ -59,6 +61,10 @@ func initialize() config {
 		"Whether 'memory' request in resource specifications is required.")
 	rootCmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
 		"Whether 'memory' request in resource specifications must be a nonzero value.")
+
+	//ingress
+	rootCmd.Flags().String("rule-ingress-violation-message", "",
+		"Additional message to be included whenever any of the ingress-related rules are violated.")
 	rootCmd.Flags().Bool("rule-ingress-collision", false,
 		"Whether ingress tls and host collision should be checked")
 

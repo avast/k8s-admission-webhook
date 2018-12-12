@@ -105,14 +105,14 @@ func (violationSet *validationViolationSet) message() string {
 	return message
 }
 
-func (validation *objectValidation) message(config *config) string {
+func (validation *objectValidation) message(configMessage string) string {
 	var message = ""
 
-	containerResourcesViolationMessage := validation.Violations.message()
-	if len(containerResourcesViolationMessage) > 0 {
-		message = fmt.Sprintf("One or more specifications are invalid: [%s]", containerResourcesViolationMessage)
-		if len(config.RuleResourceViolationMessage) > 0 {
-			message = fmt.Sprintf("%s %s", message, config.RuleResourceViolationMessage)
+	violationsMessage := validation.Violations.message()
+	if len(violationsMessage) > 0 {
+		message = fmt.Sprintf("One or more specifications are invalid: [%s]", violationsMessage)
+		if len(configMessage) > 0 {
+			message = fmt.Sprintf("%s %s", message, configMessage)
 		}
 	}
 
