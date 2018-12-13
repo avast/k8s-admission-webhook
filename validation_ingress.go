@@ -33,18 +33,18 @@ func (pathDefinition *PathDefinition) toUri() string {
 
 func ValidateIngress(validation *objectValidation, ingress *extv1beta1.Ingress, config *config) error {
 
-	targetDesc := fmt.Sprintf("Ingress %s.%s: ", ingress.Name, ingress.Namespace)
-
-	remoteIngresses, err := ingressClient().List(metav1.ListOptions{})
-	if err != nil {
-		return err
-	}
-	logger.Debugf("There are %d ingresses in the cluster to be compared", len(remoteIngresses.Items))
-
-	localPathData := ingressPath(ingress)
-	localTlsData := ingressTls(ingress)
-
 	if config.RuleIngressCollision {
+		targetDesc := fmt.Sprintf("Ingress %s.%s: ", ingress.Name, ingress.Namespace)
+
+		remoteIngresses, err := IngressClientAllNamespaces().List(metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+		logger.Debugf("There are %d ingresses in the cluster to be compared", len(remoteIngresses.Items))
+
+		localPathData := ingressPath(ingress)
+		localTlsData := ingressTls(ingress)
+
 		ValidatePathDataRegex(localPathData, validation, targetDesc)
 		ValidateTlsDataRegex(localTlsData, validation, targetDesc)
 

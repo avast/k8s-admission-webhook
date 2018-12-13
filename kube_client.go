@@ -12,12 +12,16 @@ import (
 
 var clientset *kubernetes.Clientset
 
-func initKubeClientSet(inCluster bool) {
+func InitKubeClientSet(inCluster bool) {
 	clientset = clients(inCluster)
 }
 
-func ingressClient() (ingresses v1beta1.IngressInterface) {
-	ingresses = clientset.ExtensionsV1beta1().Ingresses(metav1.NamespaceAll)
+func IngressClientAllNamespaces() v1beta1.IngressInterface {
+	return IngressClient(metav1.NamespaceAll)
+}
+
+func IngressClient(namespace string) (ingresses v1beta1.IngressInterface) {
+	ingresses = clientset.ExtensionsV1beta1().Ingresses(namespace)
 	return
 }
 

@@ -20,10 +20,10 @@ This should not be part of any automated tests. It's meant to be executed manual
 */
 func TestClusterCollisions(t *testing.T) {
 	initLogger()
-	initKubeClientSet(false)
+	InitKubeClientSet(false)
 
 	t.Run("Cross cluster validation", func(t *testing.T) {
-		remoteIngresses, err := ingressClient().List(metav1.ListOptions{})
+		remoteIngresses, err := IngressClientAllNamespaces().List(metav1.ListOptions{})
 		if assert.Nil(t, err) {
 			for _, ingress := range remoteIngresses.Items {
 				logger.Debugf("Processing ingress %s", ingress.Name)

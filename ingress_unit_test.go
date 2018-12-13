@@ -63,7 +63,7 @@ var targetDescription = "test"
 
 func TestIngress(t *testing.T) {
 	initLogger()
-	initKubeClientSet(false)
+	InitKubeClientSet(false)
 	t.Run("Path Validation	", func(t *testing.T) {
 		t.Run("Regex", func(t *testing.T) {
 			t.Run("should pass path regex validation", func(t *testing.T) {

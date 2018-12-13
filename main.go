@@ -130,7 +130,7 @@ var logger *logrus.Logger
 func main() {
 	config := initialize()
 	initLogger()
-	initKubeClientSet(true)
+	InitKubeClientSet(true)
 
 	// parse and validate arguments
 	logger.Debugf("Configuration is: %+v", config)
