@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: ingress-collision-1
-  namespace: test
+  namespace: test2
 spec:
   rules:
     - host: ingress-valid-1.avast.com
