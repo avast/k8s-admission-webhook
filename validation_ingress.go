@@ -4,6 +4,7 @@ import (
 	"fmt"
 	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"regexp"
 	"strings"
 )
@@ -31,12 +32,12 @@ func (pathDefinition *PathDefinition) toUri() string {
 	return pathDefinition.host + pathDefinition.path
 }
 
-func ValidateIngress(validation *objectValidation, ingress *extv1beta1.Ingress, config *config) error {
+func ValidateIngress(validation *objectValidation, ingress *extv1beta1.Ingress, config *config, clientSet *kubernetes.Clientset) error {
 
 	if config.RuleIngressCollision {
 		targetDesc := fmt.Sprintf("Ingress %s.%s: ", ingress.Name, ingress.Namespace)
 
-		remoteIngresses, err := IngressClientAllNamespaces().List(metav1.ListOptions{})
+		remoteIngresses, err := IngressClientAllNamespaces(clientSet).List(metav1.ListOptions{})
 		if err != nil {
 			return err
 		}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"k8s.io/client-go/kubernetes"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -12,9 +13,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-type admitFunc func(v1beta1.AdmissionReview, *config) *v1beta1.AdmissionResponse
+type admitFunc func(v1beta1.AdmissionReview, *config, *kubernetes.Clientset) *v1beta1.AdmissionResponse
 
-func serve(w http.ResponseWriter, r *http.Request, admit admitFunc, config *config) {
+func serve(w http.ResponseWriter, r *http.Request, admit admitFunc, config *config, clientSet *kubernetes.Clientset) {
 	var body []byte
 	if r.Body != nil {
 		if data, err := ioutil.ReadAll(r.Body); err == nil {
@@ -41,7 +42,7 @@ func serve(w http.ResponseWriter, r *http.Request, admit admitFunc, config *conf
 	response := v1beta1.AdmissionReview{}
 
 	if ar.Request != nil {
-		reviewResponse = admit(ar, config)
+		reviewResponse = admit(ar, config, clientSet)
 		log.Infof("sending response: %v", reviewResponse)
 
 		if reviewResponse != nil {
@@ -72,8 +73,8 @@ func toAdmissionResponse(err error) *v1beta1.AdmissionResponse {
 	}
 }
 
-func (fn admitFunc) serve(config *config) func(w http.ResponseWriter, r *http.Request) {
+func (fn admitFunc) serve(config *config, clientSet *kubernetes.Clientset) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		serve(w, r, fn, config)
+		serve(w, r, fn, config, clientSet)
 	}
 }

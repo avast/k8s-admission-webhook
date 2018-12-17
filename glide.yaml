@@ -21,3 +21,9 @@ import:
   version: 1.2.0
 - package: github.com/stretchr/testify
   version: v1.2.2
+- package: github.com/JaSei/pathutil-go
+  version: 0.3.0
+- package: github.com/mitchellh/go-homedir
+  version: v1.0.0
+- package: github.com/pkg/errors
+  version: v0.8.0

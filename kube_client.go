@@ -1,31 +1,25 @@
 package main
 
 import (
+	"errors"
+	"github.com/JaSei/pathutil-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/typed/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
-	"path/filepath"
 )
 
-var clientset *kubernetes.Clientset
-
-func InitKubeClientSet(inCluster bool) {
-	clientset = clients(inCluster)
+func IngressClientAllNamespaces(clientset *kubernetes.Clientset) v1beta1.IngressInterface {
+	return IngressClient(metav1.NamespaceAll, clientset)
 }
 
-func IngressClientAllNamespaces() v1beta1.IngressInterface {
-	return IngressClient(metav1.NamespaceAll)
-}
-
-func IngressClient(namespace string) (ingresses v1beta1.IngressInterface) {
+func IngressClient(namespace string, clientset *kubernetes.Clientset) (ingresses v1beta1.IngressInterface) {
 	ingresses = clientset.ExtensionsV1beta1().Ingresses(namespace)
 	return
 }
 
-func clients(inCluster bool) *kubernetes.Clientset {
+func KubeClientSet(inCluster bool) (*kubernetes.Clientset, error) {
 
 	var config *rest.Config
 
@@ -36,44 +30,26 @@ func clients(inCluster bool) *kubernetes.Clientset {
 		}
 		config = c
 	} else {
-		kubeconfig := filepath.Join(homeDir(), ".kube", "config")
-		exists, existsErr := fileExists(kubeconfig)
-		if existsErr != nil {
-			panic(existsErr)
+		kubeconfig, err := pathutil.Home(".kube", "config")
+		if err != nil {
+			return nil, err
 		}
-		if exists {
-			c, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+
+		if kubeconfig.IsFile() {
+			c, err := clientcmd.BuildConfigFromFlags("", kubeconfig.String())
 			if err != nil {
-				panic(err.Error())
+				return nil, err
 			}
 			config = c
 		} else {
-			panic(kubeconfig + " does not exist")
+			return nil, errors.New(kubeconfig.String() + " does not exist")
 		}
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
-	return clientset
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
-}
-
-func fileExists(name string) (bool, error) {
-	if _, err := os.Stat(name); err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		} else {
-			return false, err
-		}
-	}
-	return true, nil
+	return clientset, nil
 }

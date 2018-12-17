@@ -1,5 +1,5 @@
-hash: e9abea4ba55d6c2030b8909160812eed137b1c34f4f12c88c4d8d00a723cd5a7
-updated: 2018-11-29T13:35:30.418558404+01:00
+hash: 8f428a24b555b7c3f68481ebd328cb24b8993175a752bbb3c31412a8615fd72c
+updated: 2018-12-17T10:48:29.468774065+01:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
@@ -50,12 +50,16 @@ imports:
   version: 9316a62528ac99aaecb4e47eadd6dc8aa6533d58
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/JaSei/pathutil-go
+  version: bc27c668901b2b35d4a440dcd18f4e2d44c1b58b
 - name: github.com/json-iterator/go
   version: f2b4162afba35581b6d4a50d3b8f34e33c144682
 - name: github.com/konsorten/go-windows-terminal-sequences
   version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
 - name: github.com/magiconair/properties
   version: c2353362d570a7bfa228149c62842019201cfb71
+- name: github.com/mitchellh/go-homedir
+  version: ae18d6b8b3205b561c79e8e5f69bff09736185f4
 - name: github.com/mitchellh/mapstructure
   version: f15292f7a699fcc1a38a80977f80a046874ba8ac
 - name: github.com/modern-go/concurrent
@@ -66,6 +70,8 @@ imports:
   version: 603baefff989777996bf283da430d693e78eba3a
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/sirupsen/logrus
   version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
 - name: github.com/spf13/afero

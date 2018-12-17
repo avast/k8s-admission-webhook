@@ -10,11 +10,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"net/http"
 	"os"
 )
 
-func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResponse {
+func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.Clientset) *v1beta1.AdmissionResponse {
 	validation := &objectValidation{ar.Request.Kind.Kind, nil, &validationViolationSet{}}
 	deserializer := codecs.UniversalDeserializer()
 
@@ -103,7 +104,7 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 
 		logger.Debugf("Admitting Ingress: %+v", ingress)
 		validation.ObjMeta = &ingress.ObjectMeta
-		err := ValidateIngress(validation, &ingress, config)
+		err := ValidateIngress(validation, &ingress, config, clientSet)
 		if err != nil {
 			return toAdmissionResponse(err)
 		}
@@ -128,17 +129,17 @@ func validate(ar v1beta1.AdmissionReview, config *config) *v1beta1.AdmissionResp
 var logger *logrus.Logger
 
 func main() {
+	var err error
 	config := initialize()
 	initLogger()
-	InitKubeClientSet(true)
 
 	// parse and validate arguments
 	logger.Debugf("Configuration is: %+v", config)
 
-	http.HandleFunc("/validate", admitFunc(validate).serve(&config))
-	addr := fmt.Sprintf(":%v", config.ListenPort)
+	kubeClientSet, err := KubeClientSet(true)
 
-	var err error
+	http.HandleFunc("/validate", admitFunc(validate).serve(&config, kubeClientSet))
+	addr := fmt.Sprintf(":%v", config.ListenPort)
 
 	if config.NoTLS {
 		logger.Infof("Starting webserver at %v (no TLS)", addr)
