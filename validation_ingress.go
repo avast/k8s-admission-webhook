@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -41,7 +42,7 @@ func ValidateIngress(validation *objectValidation, ingress *extv1beta1.Ingress, 
 		if err != nil {
 			return err
 		}
-		logger.Debugf("There are %d ingresses in the cluster to be compared", len(remoteIngresses.Items))
+		log.Debugf("There are %d ingresses in the cluster to be compared", len(remoteIngresses.Items))
 
 		localPathData := ingressPath(ingress)
 		localTlsData := ingressTls(ingress)
@@ -140,7 +141,7 @@ func ingressPath(ingress *extv1beta1.Ingress) (result []PathDefinition) {
 				result = append(result, pathDefinition)
 			}
 		} else {
-			logger.Warnf("No http definition for %s.%s in rule %v", ingress.Name, ingress.Namespace, rule)
+			log.Warnf("No http definition for %s.%s in rule %v", ingress.Name, ingress.Namespace, rule)
 		}
 	}
 	return

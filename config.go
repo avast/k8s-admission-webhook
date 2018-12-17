@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strings"
-
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"strings"
 )
 
 type config struct {
@@ -33,7 +32,7 @@ var rootCmd = &cobra.Command{
 	Run:  func(cmd *cobra.Command, args []string) {},
 }
 
-func initialize() config {
+func initialize() (*config, error) {
 	rootCmd.Flags().String("tls-cert-file", "",
 		"Path to the certificate file. Required, unless --no-tls is set.")
 	rootCmd.Flags().Bool("no-tls", false,
@@ -68,22 +67,30 @@ func initialize() config {
 	rootCmd.Flags().Bool("rule-ingress-collision", false,
 		"Whether ingress tls and host collision should be checked")
 
-	_ = viper.BindPFlags(rootCmd.Flags())
+	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {
+		return errorWithUsage(err)
+	}
+
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return errorWithUsage(err)
 	}
 
-	c := config{}
-	_ = viper.Unmarshal(&c)
+	c := &config{}
+	if err := viper.Unmarshal(c); err != nil {
+		return errorWithUsage(err)
+	}
+
 	if !c.NoTLS && (c.TLSPrivateKeyFile == "" || c.TLSCertFile == "") {
-		_, _ = os.Stderr.WriteString("Both --tls-cert-file and --tls-private-key-file are required (unless TLS is disabled by setting --no-tls)\n\n")
-		_ = rootCmd.Usage()
-		os.Exit(1)
+		return errorWithUsage(errors.New("Both --tls-cert-file and --tls-private-key-file are required (unless TLS is disabled by setting --no-tls)"))
 	}
 
-	return c
+	return c, nil
+}
+
+func errorWithUsage(err error) (*config, error) {
+	log.Error(rootCmd.UsageString())
+	return nil, err
 }
