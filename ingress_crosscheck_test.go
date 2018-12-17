@@ -3,6 +3,7 @@
 package main
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"testing"
@@ -20,17 +21,18 @@ This should not be part of any automated tests. It's meant to be executed manual
 */
 func TestClusterCollisions(t *testing.T) {
 	initLogger()
-	InitKubeClientSet(false)
+	kubeClientSet, err := KubeClientSet(false)
+	assert.NoError(t, err)
 
 	t.Run("Cross cluster validation", func(t *testing.T) {
-		remoteIngresses, err := IngressClientAllNamespaces().List(metav1.ListOptions{})
+		remoteIngresses, err := IngressClientAllNamespaces(kubeClientSet).List(metav1.ListOptions{})
 		if assert.Nil(t, err) {
 			for _, ingress := range remoteIngresses.Items {
-				logger.Debugf("Processing ingress %s", ingress.Name)
+				log.Debugf("Processing ingress %s", ingress.Name)
 
 				validation := &objectValidation{ingress.Kind, nil, &validationViolationSet{}}
 				config := &config{RuleIngressCollision: true}
-				err := ValidateIngress(validation, &ingress, config)
+				err := ValidateIngress(validation, &ingress, config, kubeClientSet)
 				if assert.Nil(t, err) {
 					assert.Len(t, validation.Violations.Violations, 0)
 				}
