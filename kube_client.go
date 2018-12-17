@@ -26,7 +26,7 @@ func KubeClientSet(inCluster bool) (*kubernetes.Clientset, error) {
 	if inCluster {
 		c, err := rest.InClusterConfig()
 		if err != nil {
-			panic(err.Error())
+			return nil, err
 		}
 		config = c
 	} else {
