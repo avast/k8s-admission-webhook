@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-collision-1
+  namespace: test2
+spec:
+  rules:
+    - host: ingress-valid-1.avast.com
+      http:
+        paths:
+          - backend:
+              serviceName: nginx
+              servicePort: 8080
+            path: /
+  tls:
+    - hosts:
+        - ingress-valid-1.avast.com

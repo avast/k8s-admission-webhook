@@ -61,6 +61,10 @@ spec:
               value: "true"
             - name: RULE_RESOURCE_REQUEST_MEMORY_MUST_BE_NONZERO
               value: "true"
+            - name: RULE_INGRESS_VIOLATION_MESSAGE
+              value: "For more information, see https://internal.wiki/ingresses"
+            - name: RULE_INGRESS_COLLISION
+              value: "true"
           volumeMounts:
             - name: ssl-certs
               mountPath: "/data/ssl_certs"
@@ -110,8 +114,34 @@ webhooks:
       - operations: [ "CREATE", "UPDATE" ]
         apiGroups: ["*"]
         apiVersions: ["*"]
-        resources: ["pods", "deployments", "replicasets", "daemonsets", "jobs", "cronjobs"]
+        resources: ["pods", "deployments", "replicasets", "daemonsets", "jobs", "cronjobs", "ingresses"]
     failurePolicy: Fail
     namespaceSelector:
       matchLabels:
         webhook: enabled
+---
+# ClusterRole and ClusterRoleBinding are required only for ingress validation.
+# Service account permissions are needed to read the cluster ingresses from all namespaces for the validation
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: k8-admission-webhook
+rules:
+  - apiGroups: ["extensions"]
+    resources: ["ingresses"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: k8-admission-webhook-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: k8-admission-webhook
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+

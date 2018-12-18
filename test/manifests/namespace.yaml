@@ -4,3 +4,10 @@ metadata:
   name: test
   labels:
     webhook: enabled
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test2
+  labels:
+    webhook: enabled

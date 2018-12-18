@@ -18,9 +18,9 @@ type validationViolationSet struct {
 }
 
 type objectValidation struct {
-	Kind               string
-	ObjMeta            *metav1.ObjectMeta
-	ContainerResources *validationViolationSet
+	Kind       string
+	ObjMeta    *metav1.ObjectMeta
+	Violations *validationViolationSet
 }
 
 func validatePodSpec(validation *objectValidation, podSpec *corev1.PodSpec, config *config) {
@@ -33,16 +33,16 @@ func validatePodSpec(validation *objectValidation, podSpec *corev1.PodSpec, conf
 }
 
 func validateContainerResources(validation *objectValidation, targetDesc string, container *corev1.Container, config *config) {
-	validateResource(validation.ContainerResources, targetDesc,
+	validateResource(validation.Violations, targetDesc,
 		container.Resources.Limits, "limit", corev1.ResourceCPU,
 		config.RuleResourceLimitCPURequired, config.RuleResourceLimitCPUMustBeNonZero)
-	validateResource(validation.ContainerResources, targetDesc,
+	validateResource(validation.Violations, targetDesc,
 		container.Resources.Limits, "limit", corev1.ResourceMemory,
 		config.RuleResourceLimitMemoryRequired, config.RuleResourceLimitMemoryMustBeNonZero)
-	validateResource(validation.ContainerResources, targetDesc,
+	validateResource(validation.Violations, targetDesc,
 		container.Resources.Requests, "request", corev1.ResourceCPU,
 		config.RuleResourceRequestCPURequired, config.RuleResourceRequestCPUMustBeNonZero)
-	validateResource(validation.ContainerResources, targetDesc,
+	validateResource(validation.Violations, targetDesc,
 		container.Resources.Requests, "request", corev1.ResourceMemory,
 		config.RuleResourceRequestMemoryRequired, config.RuleResourceRequestMemoryMustBeNonZero)
 }
@@ -105,14 +105,14 @@ func (violationSet *validationViolationSet) message() string {
 	return message
 }
 
-func (validation *objectValidation) message(config *config) string {
+func (validation *objectValidation) message(configMessage string) string {
 	var message = ""
 
-	containerResourcesViolationMessage := validation.ContainerResources.message()
-	if len(containerResourcesViolationMessage) > 0 {
-		message = fmt.Sprintf("One or more container resource specifications are invalid: [%s]", containerResourcesViolationMessage)
-		if len(config.RuleResourceViolationMessage) > 0 {
-			message = fmt.Sprintf("%s %s", message, config.RuleResourceViolationMessage)
+	violationsMessage := validation.Violations.message()
+	if len(violationsMessage) > 0 {
+		message = fmt.Sprintf("One or more specifications are invalid: [%s]", violationsMessage)
+		if len(configMessage) > 0 {
+			message = fmt.Sprintf("%s %s", message, configMessage)
 		}
 	}
 

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -23,6 +23,8 @@ type config struct {
 	RuleResourceRequestCPUMustBeNonZero    bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
 	RuleResourceRequestMemoryRequired      bool   `mapstructure:"rule-resource-request-memory-required"`
 	RuleResourceRequestMemoryMustBeNonZero bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
+	RuleIngressCollision                   bool   `mapstructure:"rule-ingress-collision"`
+	RuleIngressViolationMessage            string `mapstructure:"rule-ingress-violation-message"`
 }
 
 var rootCmd = &cobra.Command{
@@ -31,7 +33,7 @@ var rootCmd = &cobra.Command{
 	Run:  func(cmd *cobra.Command, args []string) {},
 }
 
-func initialize() config {
+func initialize() (*config, error) {
 	rootCmd.Flags().String("tls-cert-file", "",
 		"Path to the certificate file. Required, unless --no-tls is set.")
 	rootCmd.Flags().Bool("no-tls", false,
@@ -40,6 +42,7 @@ func initialize() config {
 		"Path to the certificate key file. Required, unless --no-tls is set.")
 	rootCmd.Flags().Int32("listen-port", 443,
 		"Port to listen on.")
+	//resources
 	rootCmd.Flags().String("rule-resource-violation-message", "",
 		"Additional message to be included whenever any of the resource-related rules are violated.")
 	rootCmd.Flags().Bool("rule-resource-limit-cpu-required", false,
@@ -59,22 +62,36 @@ func initialize() config {
 	rootCmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
 		"Whether 'memory' request in resource specifications must be a nonzero value.")
 
-	viper.BindPFlags(rootCmd.Flags())
+	//ingress
+	rootCmd.Flags().String("rule-ingress-violation-message", "",
+		"Additional message to be included whenever any of the ingress-related rules are violated.")
+	rootCmd.Flags().Bool("rule-ingress-collision", false,
+		"Whether ingress tls and host collision should be checked")
+
+	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {
+		return errorWithUsage(err)
+	}
+
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return errorWithUsage(err)
 	}
 
-	c := config{}
-	viper.Unmarshal(&c)
+	c := &config{}
+	if err := viper.Unmarshal(c); err != nil {
+		return errorWithUsage(err)
+	}
+
 	if !c.NoTLS && (c.TLSPrivateKeyFile == "" || c.TLSCertFile == "") {
-		fmt.Println("Both --tls-cert-file and --tls-private-key-file are required (unless TLS is disabled by setting --no-tls)")
-		rootCmd.Usage()
-		os.Exit(1)
+		return errorWithUsage(errors.New("Both --tls-cert-file and --tls-private-key-file are required (unless TLS is disabled by setting --no-tls)"))
 	}
 
-	return c
+	return c, nil
+}
+
+func errorWithUsage(err error) (*config, error) {
+	log.Error(rootCmd.UsageString())
+	return nil, err
 }
