@@ -3,10 +3,11 @@
 package main
 
 import (
+	"testing"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"testing"
 )
 
 /*

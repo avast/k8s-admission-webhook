@@ -1,11 +1,12 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 type config struct {

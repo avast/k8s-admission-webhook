@@ -2,7 +2,8 @@ package main
 
 import (
 	"errors"
-	"github.com/JaSei/pathutil-go"
+
+	pathutil "github.com/JaSei/pathutil-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/typed/extensions/v1beta1"

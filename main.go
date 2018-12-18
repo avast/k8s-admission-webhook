@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	"k8s.io/api/admission/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -11,8 +14,6 @@ import (
 	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"net/http"
-	"os"
 )
 
 func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.Clientset) *v1beta1.AdmissionResponse {
