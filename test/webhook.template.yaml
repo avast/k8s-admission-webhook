@@ -111,10 +111,10 @@ webhooks:
         path: "/validate"
       caBundle: ${WEBHOOK_CA_BUNDLE}
     rules:
-      - operations: [ "CREATE", "UPDATE" ]
+      - operations: [ "*"]
         apiGroups: ["*"]
         apiVersions: ["*"]
-        resources: ["pods", "deployments", "replicasets", "daemonsets", "jobs", "cronjobs", "ingresses"]
+        resources: ["pods", "deployments", "replicasets", "daemonsets", "jobs", "cronjobs", "ingresses","statefulsets"]
     failurePolicy: Fail
     namespaceSelector:
       matchLabels:

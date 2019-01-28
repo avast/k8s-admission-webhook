@@ -22,6 +22,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 	raw := ar.Request.Object.Raw
 	var configMessage string
+	log.Debugf("Admitting kind: %+v", ar.Request.Kind.Kind)
 	switch ar.Request.Kind.Kind {
 	case "Pod":
 		configMessage = config.RuleResourceViolationMessage
@@ -109,6 +110,18 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 		if err != nil {
 			return toAdmissionResponse(err)
 		}
+
+	case "StatefulSet":
+		configMessage = config.RuleResourceViolationMessage
+		statefulSet := appsv1.StatefulSet{}
+		if _, _, err := deserializer.Decode(raw, nil, &statefulSet); err != nil {
+			log.Error(err)
+			return toAdmissionResponse(err)
+		}
+
+		log.Debugf("Admitting stateful set: %+v", statefulSet)
+		validation.ObjMeta = &statefulSet.ObjectMeta
+		validatePodSpec(validation, &statefulSet.Spec.Template.Spec, config)
 
 	default:
 		log.Warnf("Admitted an unexpected resource: %v", ar.Request.Kind)
