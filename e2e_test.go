@@ -15,18 +15,21 @@ var shouldFailWithResourcesNotSpecifiedErrors = []string{
 	"test/manifests/pod-incomplete.yaml",
 	"test/manifests/job-incomplete.yaml",
 	"test/manifests/cronjob-incomplete.yaml",
+	"test/manifests/statefulset-incomplete.yaml",
 }
 var shouldFailWithResourcesMustBeNonZeroErrors = []string{
 	"test/manifests/deployment-zero.yaml",
 	"test/manifests/pod-zero.yaml",
 	"test/manifests/job-zero.yaml",
 	"test/manifests/cronjob-zero.yaml",
+	"test/manifests/statefulset-zero.yaml",
 }
 var shouldSucceed = []string{
 	"test/manifests/deployment-complete.yaml",
 	"test/manifests/pod-complete.yaml",
 	"test/manifests/job-complete.yaml",
 	"test/manifests/cronjob-complete.yaml",
+	"test/manifests/statefulset-complete.yaml",
 }
 
 func TestManifests(t *testing.T) {
