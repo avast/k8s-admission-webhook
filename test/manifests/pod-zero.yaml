@@ -11,7 +11,7 @@ spec:
       resources:
         requests:
           cpu: "0m"
-          memory: "0m"
+          memory: "0M"
         limits:
           cpu: "0m"
-          memory: "0m"
+          memory: "0M"

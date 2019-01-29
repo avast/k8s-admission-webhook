@@ -29,9 +29,13 @@ apply-webhook:
 	  $(KUBECTL) apply -f webhook.yaml
 
 setup-test-cluster:
-	wget https://cdn.rawgit.com/kubernetes-sigs/kubeadm-dind-cluster/master/fixed/$(DIND_CLUSTER_SCRIPT) -O ./test/$(DIND_CLUSTER_SCRIPT)
+	if [ "$(KUBERNETES_VERSION)" = "1.9" ]; then \
+		wget https://raw.githubusercontent.com/kubernetes-sigs/kubeadm-dind-cluster/3cde76608aed0d64895077a0cf2f2e3b9e7323da/fixed/dind-cluster-v1.9.sh -O ./test/$(DIND_CLUSTER_SCRIPT); \
+	else \
+		wget https://github.com/kubernetes-sigs/kubeadm-dind-cluster/releases/download/v0.1.0/$(DIND_CLUSTER_SCRIPT) -O ./test/$(DIND_CLUSTER_SCRIPT); \
+	fi
 	chmod +x ./test/$(DIND_CLUSTER_SCRIPT)
-	export API_SERVER_ADMISSION_ARG=$$(if [ "$(KUBERNETES_VERSION)" = "1.11" ]; then echo enable_admission_plugins; else echo admission_control; fi) && \
+	export API_SERVER_ADMISSION_ARG=$$(if [ "$(KUBERNETES_VERSION)" = "1.11" ] || [ "$(KUBERNETES_VERSION)" = "1.12" ] || [ "$(KUBERNETES_VERSION)" = "1.13" ]; then echo enable_admission_plugins; else echo admission_control; fi) && \
 	  export APISERVER_$${API_SERVER_ADMISSION_ARG}=$(ADMISSION_PLUGIN_LIST) && \
 	  NUM_NODES=1 \
 	    ./test/$(DIND_CLUSTER_SCRIPT) up

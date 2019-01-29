@@ -26,6 +26,7 @@ Resource spec validation operates on:
 * `DaemonSet`s
 * `Job`s
 * `CronJob`s
+* `StatefulSet`s
 
 Host and path validation operates on:
 * `Ingress`es
