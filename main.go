@@ -22,7 +22,6 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 	raw := ar.Request.Object.Raw
 	var configMessage string
-	log.Debugf("Admitting kind: %+v", ar.Request.Kind.Kind)
 	switch ar.Request.Kind.Kind {
 	case "Pod":
 		configMessage = config.RuleResourceViolationMessage

@@ -111,7 +111,7 @@ webhooks:
         path: "/validate"
       caBundle: ${WEBHOOK_CA_BUNDLE}
     rules:
-      - operations: [ "*"]
+      - operations: [ "CREATE", "UPDATE"]
         apiGroups: ["*"]
         apiVersions: ["*"]
         resources: ["pods", "deployments", "replicasets", "daemonsets", "jobs", "cronjobs", "ingresses","statefulsets"]
