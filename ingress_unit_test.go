@@ -11,6 +11,7 @@ var defaultName = "defaultIngressName"
 var defaultNamespace = "defaultIngressNamespace"
 var defaultSecret = "defaultSecret"
 var collisionName = "collisionName"
+var testNamespace = "testNamespace"
 
 var defaultPaths = []PathDefinition{
 	{"service1.avast.com", "/", "service1", "80", defaultName, defaultNamespace},
@@ -44,6 +45,8 @@ var collisionPaths = []PathDefinition{
 	{"service2.avast.com", "/app", "service3", "80", collisionName, defaultNamespace},
 	//changed port
 	{"service3.avast.com", "/service3/", "service3", "8080", collisionName, defaultNamespace},
+	//changed namespace
+	{"service3.avast.com", "/service3/", "service3", "80", collisionName, testNamespace},
 }
 
 var defaultTls = []TlsDefinition{
@@ -89,7 +92,7 @@ func TestIngress(t *testing.T) {
 			t.Run("should not pass path collision validation - collision paths", func(t *testing.T) {
 				validation := &objectValidation{"Ingress", &metav1.ObjectMeta{}, &validationViolationSet{}}
 				ValidatePathDataCollision(collisionPaths, defaultPaths, validation, targetDescription)
-				assert.Len(t, validation.Violations.Violations, 3)
+				assert.Len(t, validation.Violations.Violations, 4)
 			})
 			t.Run("should pass path collision validation - twice defaultPaths", func(t *testing.T) {
 				validation := &objectValidation{"Ingress", &metav1.ObjectMeta{}, &validationViolationSet{}}

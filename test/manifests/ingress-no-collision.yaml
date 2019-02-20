@@ -5,7 +5,7 @@ metadata:
   namespace: test2
 spec:
   rules:
-    - host: ingress-valid-1.avast.com
+    - host: ingress-valid-2.avast.com
       http:
         paths:
           - backend:
