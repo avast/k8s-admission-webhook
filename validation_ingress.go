@@ -34,6 +34,10 @@ func (pathDefinition *PathDefinition) toUri() string {
 	return pathDefinition.host + pathDefinition.path
 }
 
+func (pathDefinition *PathDefinition) toServiceTarget() string {
+	return pathDefinition.serviceName + "." + pathDefinition.ingressNamespace + ":" + pathDefinition.servicePort
+}
+
 func ValidateIngress(validation *objectValidation, ingress *extv1beta1.Ingress, config *config, clientSet *kubernetes.Clientset) error {
 
 	if config.RuleIngressCollision {
@@ -103,10 +107,10 @@ func ValidatePathDataCollision(newIngressPathData []PathDefinition, existingIngr
 			// only other ingresses are considered - when updating it's not a collision
 			if nameWithNamespace(newIngressPath) != nameWithNamespace(existingIngressPath) {
 				if newIngressPath.toUri() == existingIngressPath.toUri() {
-					if newIngressPath.serviceName != existingIngressPath.serviceName || newIngressPath.servicePort != existingIngressPath.servicePort {
+					if newIngressPath.toServiceTarget() != existingIngressPath.toServiceTarget() {
 						violation := validationViolation{
 							targetDesc,
-							fmt.Sprintf("Path collision with '%s' -> '%s:%s'", existingIngressPath.toUri(), existingIngressPath.serviceName, existingIngressPath.servicePort),
+							fmt.Sprintf("Path collision with '%s' -> '%s'", existingIngressPath.toUri(), existingIngressPath.toServiceTarget()),
 						}
 						validation.Violations.add(violation)
 					}
