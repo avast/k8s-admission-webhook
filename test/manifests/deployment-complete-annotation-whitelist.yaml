@@ -1,17 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: invalid-deployment-update
+  name: deployment-complete-annotation-whitelist
   namespace: test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: invalid-deployment-update
+      app: sleep-complete
   template:
     metadata:
       labels:
-        app: invalid-deployment-update
+        app: sleep-complete
+      annotations:
+        admission.writable.container.root.required/sleep-writable: "true"
     spec:
       containers:
       - name: sleep
@@ -26,3 +28,13 @@ spec:
             memory: "30M"
         securityContext:
           readOnlyRootFilesystem: true
+      - name: sleep-writable
+        image: tutum/curl
+        command: ["/bin/sleep","infinity"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "5M"
+          limits:
+            cpu: "200m"
+            memory: "30M"

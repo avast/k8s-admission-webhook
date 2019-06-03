@@ -24,12 +24,28 @@ var shouldFailWithResourcesMustBeNonZeroErrors = []string{
 	"test/manifests/cronjob-zero.yaml",
 	"test/manifests/statefulset-zero.yaml",
 }
+var shouldFailWithWritableRootFilesystemError = []string{
+	"test/manifests/pod-readonly-filesystem-false.yaml",
+	"test/manifests/pod-readonly-filesystem-missing.yaml",
+	"test/manifests/pod-readonly-filesystem-annotation-missing.yaml",
+	"test/manifests/pod-readonly-filesystem-annotation-false.yaml",
+}
 var shouldSucceed = []string{
 	"test/manifests/deployment-complete.yaml",
 	"test/manifests/pod-complete.yaml",
 	"test/manifests/job-complete.yaml",
 	"test/manifests/cronjob-complete.yaml",
 	"test/manifests/statefulset-complete.yaml",
+	"test/manifests/pod-readonly-filesystem-annotation-whitelist.yaml",
+	"test/manifests/pod-readonly-filesystem-annotation-list-whitelist.yaml",
+	"test/manifests/deployment-complete-annotation-whitelist.yaml",
+	"test/manifests/deployment-complete-annotation-list-whitelist.yaml",
+	"test/manifests/cronjob-complete-annotation-whitelist.yaml",
+	"test/manifests/cronjob-complete-annotation-list-whitelist.yaml",
+	"test/manifests/job-complete-annotation-whitelist.yaml",
+	"test/manifests/job-complete-annotation-list-whitelist.yaml",
+	"test/manifests/statefulset-complete-annotation-whitelist.yaml",
+	"test/manifests/statefulset-complete-annotation-list-whitelist.yaml",
 }
 
 func TestManifests(t *testing.T) {
@@ -54,6 +70,14 @@ func TestManifests(t *testing.T) {
 					assert.Contains(t, err.Error(), "'memory' resource limit must be a nonzero value")
 					assert.Contains(t, err.Error(), "'cpu' resource request must be a nonzero value")
 					assert.Contains(t, err.Error(), "'memory' resource request must be a nonzero value")
+				}
+			})
+		}
+		for _, p := range shouldFailWithWritableRootFilesystemError {
+			t.Run(fmt.Sprintf("%s should fail because security context is missing or root filesystem is not readonly", p), func(t *testing.T) {
+				err = applyManifest(p, true)
+				if assert.Error(t, err) {
+					assert.Contains(t, err.Error(), "'securityContext' with 'readOnlyRootFilesystem: true' must be specified")
 				}
 			})
 		}

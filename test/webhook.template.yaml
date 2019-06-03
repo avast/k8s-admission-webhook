@@ -61,6 +61,8 @@ spec:
               value: "true"
             - name: RULE_RESOURCE_REQUEST_MEMORY_MUST_BE_NONZERO
               value: "true"
+            - name: RULE_SECURITY_READONLY_ROOT_FILESYSTEM_REQUIRED
+              value: "true"
             - name: RULE_INGRESS_VIOLATION_MESSAGE
               value: "For more information, see https://internal.wiki/ingresses"
             - name: RULE_INGRESS_COLLISION

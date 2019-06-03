@@ -15,4 +15,5 @@ spec:
           resources:
             requests:
             limits:
+          securityContext:
       restartPolicy: Never

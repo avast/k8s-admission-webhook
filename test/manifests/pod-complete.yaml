@@ -15,3 +15,5 @@ spec:
         limits:
           cpu: "200m"
           memory: "30M"
+      securityContext:
+          readOnlyRootFilesystem: true

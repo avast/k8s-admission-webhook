@@ -33,7 +33,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 		log.Debugf("Admitting Pod: %+v", pod)
 		validation.ObjMeta = &pod.ObjectMeta
-		validatePodSpec(validation, &pod.Spec, config)
+		validatePodSpec(validation, &pod.ObjectMeta, &pod.Spec, config)
 
 	case "ReplicaSet":
 		configMessage = config.RuleResourceViolationMessage
@@ -45,7 +45,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 		log.Debugf("Admitting ReplicaSet: %+v", replicaSet)
 		validation.ObjMeta = &replicaSet.ObjectMeta
-		validatePodSpec(validation, &replicaSet.Spec.Template.Spec, config)
+		validatePodSpec(validation, &replicaSet.Spec.Template.ObjectMeta, &replicaSet.Spec.Template.Spec, config)
 
 	case "Deployment":
 		configMessage = config.RuleResourceViolationMessage
@@ -57,7 +57,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 		log.Debugf("Admitting deployment: %+v", deployment)
 		validation.ObjMeta = &deployment.ObjectMeta
-		validatePodSpec(validation, &deployment.Spec.Template.Spec, config)
+		validatePodSpec(validation, &deployment.Spec.Template.ObjectMeta, &deployment.Spec.Template.Spec, config)
 
 	case "DaemonSet":
 		configMessage = config.RuleResourceViolationMessage
@@ -69,7 +69,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 		log.Debugf("Admitting DaemonSet: %+v", daemonSet)
 		validation.ObjMeta = &daemonSet.ObjectMeta
-		validatePodSpec(validation, &daemonSet.Spec.Template.Spec, config)
+		validatePodSpec(validation, &daemonSet.Spec.Template.ObjectMeta, &daemonSet.Spec.Template.Spec, config)
 
 	case "Job":
 		configMessage = config.RuleResourceViolationMessage
@@ -81,7 +81,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 		log.Debugf("Admitting Job: %+v", job)
 		validation.ObjMeta = &job.ObjectMeta
-		validatePodSpec(validation, &job.Spec.Template.Spec, config)
+		validatePodSpec(validation, &job.Spec.Template.ObjectMeta, &job.Spec.Template.Spec, config)
 
 	case "CronJob":
 		configMessage = config.RuleResourceViolationMessage
@@ -93,7 +93,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 		log.Debugf("Admitting CronJob: %+v", cronJob)
 		validation.ObjMeta = &cronJob.ObjectMeta
-		validatePodSpec(validation, &cronJob.Spec.JobTemplate.Spec.Template.Spec, config)
+		validatePodSpec(validation, &cronJob.Spec.JobTemplate.Spec.Template.ObjectMeta, &cronJob.Spec.JobTemplate.Spec.Template.Spec, config)
 
 	case "Ingress":
 		configMessage = config.RuleIngressViolationMessage
@@ -120,7 +120,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 
 		log.Debugf("Admitting stateful set: %+v", statefulSet)
 		validation.ObjMeta = &statefulSet.ObjectMeta
-		validatePodSpec(validation, &statefulSet.Spec.Template.Spec, config)
+		validatePodSpec(validation, &statefulSet.Spec.Template.ObjectMeta, &statefulSet.Spec.Template.Spec, config)
 
 	default:
 		log.Warnf("Admitted an unexpected resource: %v", ar.Request.Kind)
