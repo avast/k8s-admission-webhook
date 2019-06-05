@@ -111,7 +111,7 @@ func containerReadonlyFilesystemShouldBeChecked(podMetadata *metav1.ObjectMeta, 
 	    }
 	}
 	// Check if container is whitelisted by annotation (list of containers in one annotation)
-	if annotationValue, ok := podMetadata.Annotations[config.AdmissionWritableRootRequiredAnnotationsPrefix + "/list"]; ok {
+	if annotationValue, ok := podMetadata.Annotations[config.AdmissionWritableRootRequiredAnnotationsPrefix]; ok {
 		var whitelistedContainers []string
 	    if err := json.Unmarshal([]byte(annotationValue), &whitelistedContainers); err == nil {
 	    	for _, containerName := range whitelistedContainers {

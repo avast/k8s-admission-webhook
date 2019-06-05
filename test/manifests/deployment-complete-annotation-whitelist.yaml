@@ -13,7 +13,7 @@ spec:
       labels:
         app: sleep-complete
       annotations:
-        admission.writable.container.root.required/sleep-writable: "true"
+        exceptions.rorootfs.validation/sleep-writable: "true"
     spec:
       containers:
       - name: sleep

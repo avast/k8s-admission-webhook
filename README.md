@@ -66,7 +66,7 @@ Note that every option can also be specified via an environment variable: enviro
 ```
 
 In case you want to check `readOnlyRootFilesystem` property globally but also allow some containers requiring writable root filesystem, they can be whitelisted by using annotations.
-Annotations are required at Pod level and have default prefix `admission.writable.container.root.required` which can be changed by configuration flag.
+Annotations are required at Pod level and have default prefix `exceptions.rorootfs.validation` which can be changed by configuration flag.
 
 There are two ways how to whitelist container:
 * Using annotation per container in format `{annotation_prefix}/{container_name}: true`
@@ -77,8 +77,8 @@ metadata:
   name: pod-name
   namespace: test
   annotations:
-    admission.writable.container.root.required/container-name-1: "true"
-    admission.writable.container.root.required/container-name-2: "true"
+    exceptions.rorootfs.validation/container-name-1: "true"
+    exceptions.rorootfs.validation/container-name-2: "true"
 spec:
   containers:
     - name: container-name-1
@@ -92,7 +92,7 @@ spec:
       resources:
         .....
 ```
-* Using one annotation for all containers in format `{annotation_prefix}/list: '["{container_name_1}","{container_name_2}"]'`
+* Using one annotation for all containers in format `{annotation_prefix}: '["{container_name_1}","{container_name_2}"]'`
 ```
 apiVersion: v1
 kind: Pod
@@ -100,7 +100,7 @@ metadata:
   name: pod-name
   namespace: test
   annotations:
-    admission.writable.container.root.required/list: '["container-name-1", "container-name-2"]'
+    exceptions.rorootfs.validation: '["container-name-1", "container-name-2"]'
 spec:
   containers:
     - name: container-name-1

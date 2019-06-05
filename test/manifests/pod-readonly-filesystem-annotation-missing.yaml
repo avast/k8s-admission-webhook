@@ -4,7 +4,7 @@ metadata:
   name: pod-sleep-readonly-filesystem-annotation-missing
   namespace: test
   annotations:
-    admission.writable.container.root.required/sleep-writable: "true"
+    exceptions.rorootfs.validation/sleep-writable: "true"
 spec:
   containers:
     - name: sleep

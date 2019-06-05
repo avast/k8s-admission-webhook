@@ -4,8 +4,8 @@ metadata:
   name: pod-sleep-readonly-filesystem-annotation-false
   namespace: test
   annotations:
-    admission.writable.container.root.required/sleep1: "false"
-    admission.writable.container.root.required/sleep2: "kwoufgvsm.fud.eohavs"
+    exceptions.rorootfs.validation/sleep1: "false"
+    exceptions.rorootfs.validation/sleep2: "kwoufgvsm.fud.eohavs"
 spec:
   containers:
     - name: sleep1

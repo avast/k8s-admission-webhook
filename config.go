@@ -73,7 +73,7 @@ func initialize() (*config, error) {
 		"Whether ingress tls and host collision should be checked")
 
 	//customizations
-	rootCmd.Flags().String("admission-writable-root-required-annotations-prefix", "admission.writable.container.root.required",
+	rootCmd.Flags().String("admission-writable-root-required-annotations-prefix", "exceptions.rorootfs.validation",
 		"What annotation prefix should be used for readonly root filesystem check exceptions.")
 
 	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {

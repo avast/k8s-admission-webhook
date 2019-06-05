@@ -8,7 +8,7 @@ spec:
     metadata:
       name: job-complete
       annotations:
-        admission.writable.container.root.required/sleep: "true"
+        exceptions.rorootfs.validation/sleep: "true"
     spec:
       containers:
         - name: sleep

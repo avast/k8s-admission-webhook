@@ -13,7 +13,7 @@ spec:
       labels:
         app: nginx
       annotations:
-        admission.writable.container.root.required/list: '["nginx"]'
+        exceptions.rorootfs.validation: '["nginx"]'
     spec:
       containers:
         - name: nginx
