@@ -10,23 +10,23 @@ import (
 )
 
 type config struct {
-	NoTLS                                  			bool   `mapstructure:"no-tls"`
-	TLSCertFile                            			string `mapstructure:"tls-cert-file"`
-	TLSPrivateKeyFile                      			string `mapstructure:"tls-private-key-file"`
-	ListenPort                             			int    `mapstructure:"listen-port"`
-	RuleResourceViolationMessage           			string `mapstructure:"rule-resource-violation-message"`
-	RuleResourceLimitCPURequired           			bool   `mapstructure:"rule-resource-limit-cpu-required"`
-	RuleResourceLimitCPUMustBeNonZero      			bool   `mapstructure:"rule-resource-limit-cpu-must-be-nonzero"`
-	RuleResourceLimitMemoryRequired        			bool   `mapstructure:"rule-resource-limit-memory-required"`
-	RuleResourceLimitMemoryMustBeNonZero   			bool   `mapstructure:"rule-resource-limit-memory-must-be-nonzero"`
-	RuleResourceRequestCPURequired         			bool   `mapstructure:"rule-resource-request-cpu-required"`
-	RuleResourceRequestCPUMustBeNonZero    			bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
-	RuleResourceRequestMemoryRequired      			bool   `mapstructure:"rule-resource-request-memory-required"`
-	RuleResourceRequestMemoryMustBeNonZero 			bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
-	RuleSecurityReadonlyRootFilesystemRequired 		bool   `mapstructure:"rule-security-readonly-root-filesystem-required"`
-	RuleIngressCollision                   			bool   `mapstructure:"rule-ingress-collision"`
-	RuleIngressViolationMessage            			string `mapstructure:"rule-ingress-violation-message"`
-	AdmissionWritableRootRequiredAnnotationsPrefix 	string `mapstructure:"admission-writable-root-required-annotations-prefix"`
+	NoTLS                                           bool   `mapstructure:"no-tls"`
+	TLSCertFile                                     string `mapstructure:"tls-cert-file"`
+	TLSPrivateKeyFile                               string `mapstructure:"tls-private-key-file"`
+	ListenPort                                      int    `mapstructure:"listen-port"`
+	RuleResourceViolationMessage                    string `mapstructure:"rule-resource-violation-message"`
+	RuleResourceLimitCPURequired                    bool   `mapstructure:"rule-resource-limit-cpu-required"`
+	RuleResourceLimitCPUMustBeNonZero               bool   `mapstructure:"rule-resource-limit-cpu-must-be-nonzero"`
+	RuleResourceLimitMemoryRequired                 bool   `mapstructure:"rule-resource-limit-memory-required"`
+	RuleResourceLimitMemoryMustBeNonZero            bool   `mapstructure:"rule-resource-limit-memory-must-be-nonzero"`
+	RuleResourceRequestCPURequired                  bool   `mapstructure:"rule-resource-request-cpu-required"`
+	RuleResourceRequestCPUMustBeNonZero             bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
+	RuleResourceRequestMemoryRequired               bool   `mapstructure:"rule-resource-request-memory-required"`
+	RuleResourceRequestMemoryMustBeNonZero          bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
+	RuleSecurityReadonlyRootFilesystemRequired      bool   `mapstructure:"rule-security-readonly-root-filesystem-required"`
+	RuleIngressCollision                            bool   `mapstructure:"rule-ingress-collision"`
+	RuleIngressViolationMessage                     string `mapstructure:"rule-ingress-violation-message"`
+	AdmissionWritableRootRequiredAnnotationsPrefix  string `mapstructure:"admission-writable-root-required-annotations-prefix"`
 }
 
 var rootCmd = &cobra.Command{
