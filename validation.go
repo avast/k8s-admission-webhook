@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"strings"
-	"strconv"
-	"encoding/json"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -99,28 +97,31 @@ func isResourceNonZero(resList corev1.ResourceList, name corev1.ResourceName) bo
 }
 
 func containerReadonlyFilesystemShouldBeChecked(podMetadata *metav1.ObjectMeta, container *corev1.Container, config *config) bool {
-	// Check if container security check is turned off
+	// If readonly root FS check is turned off, do not validate
 	if !config.RuleSecurityReadonlyRootFilesystemRequired {
 		return false
 	}
-	// Check if container is whitelisted by annotation (key of annotation contains container name)
-	if annotationValue, ok := podMetadata.Annotations[config.AdmissionWritableRootRequiredAnnotationsPrefix + "/" + container.Name]; ok {
-		readonlyRootStorageCheckIgnored, err := strconv.ParseBool(annotationValue)
-	    if err == nil {
-	        return !readonlyRootStorageCheckIgnored
-	    }
+
+	// If whitelisting of containers is turned off, validate each container
+	if !config.RuleSecurityReadonlyRootFilesystemRequiredWhitelistEnabled {
+		return true
 	}
+
 	// Check if container is whitelisted by annotation (list of containers in one annotation)
-	if annotationValue, ok := podMetadata.Annotations[config.AdmissionWritableRootRequiredAnnotationsPrefix]; ok {
-		var whitelistedContainers []string
-	    if err := json.Unmarshal([]byte(annotationValue), &whitelistedContainers); err == nil {
-	    	for _, containerName := range whitelistedContainers {
-		        if containerName == container.Name {
-		            return false
-		        }
-		    }
+	annotation := "readonly-rootfs-containers-whitelist"
+	if config.AdmissionValidationAnnotationsPrefix != "" {
+		annotation = config.AdmissionValidationAnnotationsPrefix + "/" + annotation
+	}
+	if annotationValue, ok := podMetadata.Annotations[annotation]; ok {
+	    whitelistedContainers := strings.Split(annotationValue, ",")
+    	for _, containerName := range whitelistedContainers {
+    		containerName = strings.TrimSpace(containerName)
+	        if containerName == container.Name {
+	            return false
+	        }
 	    }
 	}
+	
 	return true
 }
 

@@ -10,7 +10,7 @@ spec:
       template:
         metadata:
           annotations:
-            exceptions.rorootfs.validation: '["sleep"]'
+            readonly-rootfs-containers-whitelist: "sleep"
         spec:
           containers:
             - name: sleep

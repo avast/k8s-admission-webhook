@@ -13,7 +13,7 @@ spec:
       labels:
         app: nginx
       annotations:
-        exceptions.rorootfs.validation: '["nginx"]'
+        readonly-rootfs-containers-whitelist: "nginx"
     spec:
       containers:
         - name: nginx

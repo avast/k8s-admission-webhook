@@ -13,7 +13,7 @@ spec:
       labels:
         app: sleep-complete
       annotations:
-        exceptions.rorootfs.validation: '["sleep-writable"]'
+        readonly-rootfs-containers-whitelist: "sleep-writable"
     spec:
       containers:
       - name: sleep

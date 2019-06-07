@@ -4,7 +4,7 @@ metadata:
   name: pod-sleep-readonly-filesystem-annotation-list-whitelist
   namespace: test
   annotations:
-    exceptions.rorootfs.validation: '["sleep1", "sleep2"]'
+    readonly-rootfs-containers-whitelist: "sleep1, sleep2"
 spec:
   containers:
     - name: sleep1

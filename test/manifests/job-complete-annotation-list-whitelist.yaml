@@ -8,7 +8,7 @@ spec:
     metadata:
       name: job-complete
       annotations:
-        exceptions.rorootfs.validation: '["sleep"]'
+        readonly-rootfs-containers-whitelist: "sleep"
     spec:
       containers:
         - name: sleep
