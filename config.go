@@ -78,7 +78,7 @@ func initialize() (*config, error) {
 
 	//customizations
 	rootCmd.Flags().String("admission-validation-annotations-prefix", "",
-		"What annotation prefix should be used for readonly root filesystem check exceptions.")
+		"What prefix should be used for admission validation annotations.")
 
 	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {
 		return errorWithUsage(err)
