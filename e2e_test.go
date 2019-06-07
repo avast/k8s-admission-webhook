@@ -36,15 +36,10 @@ var shouldSucceed = []string{
 	"test/manifests/job-complete.yaml",
 	"test/manifests/cronjob-complete.yaml",
 	"test/manifests/statefulset-complete.yaml",
-	"test/manifests/pod-readonly-filesystem-annotation-whitelist.yaml",
 	"test/manifests/pod-readonly-filesystem-annotation-list-whitelist.yaml",
-	"test/manifests/deployment-complete-annotation-whitelist.yaml",
 	"test/manifests/deployment-complete-annotation-list-whitelist.yaml",
-	"test/manifests/cronjob-complete-annotation-whitelist.yaml",
 	"test/manifests/cronjob-complete-annotation-list-whitelist.yaml",
-	"test/manifests/job-complete-annotation-whitelist.yaml",
 	"test/manifests/job-complete-annotation-list-whitelist.yaml",
-	"test/manifests/statefulset-complete-annotation-whitelist.yaml",
 	"test/manifests/statefulset-complete-annotation-list-whitelist.yaml",
 }
 
