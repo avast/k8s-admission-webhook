@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-sleep-readonly-filesystem-annotation-false
+  name: pod-readonly-rootfs-annotation-whitelist
   namespace: test
   annotations:
-    readonly-rootfs-containers-whitelist: "nonexisting1, nonexisting2"
+    readonly-rootfs-containers-whitelist: "sleep1, sleep2"
 spec:
   containers:
     - name: sleep1

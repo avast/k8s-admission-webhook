@@ -61,9 +61,9 @@ spec:
               value: "true"
             - name: RULE_RESOURCE_REQUEST_MEMORY_MUST_BE_NONZERO
               value: "true"
-            - name: RULE_SECURITY_READONLY_ROOT_FILESYSTEM_REQUIRED
+            - name: RULE_SECURITY_READONLY_ROOTFS_REQUIRED
               value: "true"
-            - name: RULE_SECURITY_READONLY_ROOT_FILESYSTEM_REQUIRED_WHITELIST_ENABLED
+            - name: RULE_SECURITY_READONLY_ROOTFS_REQUIRED_WHITELIST_ENABLED
               value: "true"
             - name: RULE_INGRESS_VIOLATION_MESSAGE
               value: "For more information, see https://internal.wiki/ingresses"

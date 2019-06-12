@@ -25,10 +25,10 @@ var shouldFailWithResourcesMustBeNonZeroErrors = []string{
 	"test/manifests/statefulset-zero.yaml",
 }
 var shouldFailWithWritableRootFilesystemError = []string{
-	"test/manifests/pod-readonly-filesystem-false.yaml",
-	"test/manifests/pod-readonly-filesystem-missing.yaml",
-	"test/manifests/pod-readonly-filesystem-annotation-missing.yaml",
-	"test/manifests/pod-readonly-filesystem-annotation-false.yaml",
+	"test/manifests/pod-readonly-rootfs-false.yaml",
+	"test/manifests/pod-readonly-rootfs-missing.yaml",
+	"test/manifests/pod-readonly-rootfs-annotation-missing.yaml",
+	"test/manifests/pod-readonly-rootfs-annotation-false.yaml",
 }
 var shouldSucceed = []string{
 	"test/manifests/deployment-complete.yaml",
@@ -36,11 +36,11 @@ var shouldSucceed = []string{
 	"test/manifests/job-complete.yaml",
 	"test/manifests/cronjob-complete.yaml",
 	"test/manifests/statefulset-complete.yaml",
-	"test/manifests/pod-readonly-filesystem-annotation-list-whitelist.yaml",
-	"test/manifests/deployment-complete-annotation-list-whitelist.yaml",
-	"test/manifests/cronjob-complete-annotation-list-whitelist.yaml",
-	"test/manifests/job-complete-annotation-list-whitelist.yaml",
-	"test/manifests/statefulset-complete-annotation-list-whitelist.yaml",
+	"test/manifests/pod-readonly-rootfs-annotation-whitelist.yaml",
+	"test/manifests/deployment-complete-annotation-whitelist.yaml",
+	"test/manifests/cronjob-complete-annotation-whitelist.yaml",
+	"test/manifests/job-complete-annotation-whitelist.yaml",
+	"test/manifests/statefulset-complete-annotation-whitelist.yaml",
 }
 
 func TestManifests(t *testing.T) {

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-sleep-complete
+  name: pod-complete
   namespace: test
 spec:
   containers:

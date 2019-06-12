@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-complete-annotation-list-whitelist
+  name: deployment-complete-annotation-whitelist
   namespace: test
 spec:
   replicas: 1

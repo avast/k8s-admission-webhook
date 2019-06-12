@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-sleep-readonly-filesystem-false
+  name: pod-readonly-rootfs-missing
   namespace: test
 spec:
   containers:
@@ -16,4 +16,3 @@ spec:
           cpu: "200m"
           memory: "30M"
       securityContext:
-          readOnlyRootFilesystem: false

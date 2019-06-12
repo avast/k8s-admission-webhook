@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: cronjob-complete-annotation-list-whitelist
+  name: cronjob-complete-annotation-whitelist
   namespace: test
 spec:
   schedule: "*/1 * * * *"
