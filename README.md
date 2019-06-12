@@ -56,21 +56,21 @@ Note that every option can also be specified via an environment variable: enviro
 --rule-resource-request-cpu-required                                 Whether 'cpu' request in resource specifications is required.
 --rule-resource-request-memory-must-be-nonzero                       Whether 'memory' request in resource specifications must be a nonzero value.
 --rule-resource-request-memory-required                              Whether 'memory' request in resource specifications is required.
---rule-security-readonly-root-filesystem-required                    Whether 'readOnlyRootFilesystem' in security context specifications is required.
---rule-security-readonly-root-filesystem-required-whitelist-enabled  Whether rule 'readOnlyRootFilesystem' in security context can be overriden by container whitelisting.
+--rule-security-readonly-rootfs-required                             Whether 'readOnlyRootFilesystem' in security context specifications is required.
+--rule-security-readonly-rootfs-required-whitelist-enabled           Whether rule 'readOnlyRootFilesystem' in security context can be ignored by container whitelisting.
 --rule-resource-violation-message                                    Additional message to be included whenever any of the resource-related rules are violated.
 --rule-ingress-collision                                             Whether ingress tls and host collision should be checked 
 --rule-ingress-violation-message                                     Additional message to be included whenever any of the ingress-related rules are violated.
 --tls-cert-file string                                               Path to the certificate file. Required, unless --no-tls is set.
 --tls-private-key-file string                                        Path to the certificate key file. Required, unless --no-tls is set.
---admission-validation-annotations-prefix                            What prefix should be used for admission validation annotations.
+--annotations-prefix                                                 What prefix should be used for admission validation annotations.
 ```
 
 In case you want to check `readOnlyRootFilesystem` property globally but also allow some containers requiring writable root filesystem, they can be whitelisted by using annotations.
 In order to do that you need to:
-* Allow whitelisting of containers for this option by `--rule-security-readonly-root-filesystem-required-whitelist-enabled` config
+* Allow whitelisting of containers for this option by `--rule-security-readonly-rootfs-required-whitelist-enabled` option
 * Provide annotation `readonly-rootfs-containers-whitelist` at Pod level (by default, this annotation does not have prefix)
-* If you want to add prefix for all admission validation annotations, use `--admission-validation-annotations-prefix` config
+* If you want to add prefix for all admission validation annotations, use `--annotations-prefix` option
 
 Example:
 * Default usage of annotation `readonly-rootfs-containers-whitelist: "{container_name_1}, {container_name_2}"`

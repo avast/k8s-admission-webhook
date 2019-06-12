@@ -23,11 +23,11 @@ type config struct {
 	RuleResourceRequestCPUMustBeNonZero                         bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
 	RuleResourceRequestMemoryRequired                           bool   `mapstructure:"rule-resource-request-memory-required"`
 	RuleResourceRequestMemoryMustBeNonZero                      bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
-	RuleSecurityReadonlyRootFilesystemRequired                  bool   `mapstructure:"rule-security-readonly-root-filesystem-required"`
-	RuleSecurityReadonlyRootFilesystemRequiredWhitelistEnabled  bool   `mapstructure:"rule-security-readonly-root-filesystem-required-whitelist-enabled"`
+	RuleSecurityReadonlyRootFilesystemRequired                  bool   `mapstructure:"rule-security-readonly-rootfs-required"`
+	RuleSecurityReadonlyRootFilesystemRequiredWhitelistEnabled  bool   `mapstructure:"rule-security-readonly-rootfs-required-whitelist-enabled"`
 	RuleIngressCollision                                        bool   `mapstructure:"rule-ingress-collision"`
 	RuleIngressViolationMessage                                 string `mapstructure:"rule-ingress-violation-message"`
-	AdmissionValidationAnnotationsPrefix                        string `mapstructure:"admission-validation-annotations-prefix"`
+	AnnotationsPrefix                                           string `mapstructure:"annotations-prefix"`
 }
 
 var rootCmd = &cobra.Command{
@@ -65,10 +65,10 @@ func initialize() (*config, error) {
 		"Whether 'memory' request in resource specifications is required.")
 	rootCmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
 		"Whether 'memory' request in resource specifications must be a nonzero value.")
-	rootCmd.Flags().Bool("rule-security-readonly-root-filesystem-required", false,
+	rootCmd.Flags().Bool("rule-security-readonly-rootfs-required", false,
 		"Whether 'readOnlyRootFilesystem' in security context specifications is required.")
-	rootCmd.Flags().Bool("rule-security-readonly-root-filesystem-required-whitelist-enabled", false,
-		"Whether rule 'readOnlyRootFilesystem' in security context can be overriden by container whitelisting.")
+	rootCmd.Flags().Bool("rule-security-readonly-rootfs-required-whitelist-enabled", false,
+		"Whether rule 'readOnlyRootFilesystem' in security context can be ignored by container whitelisting.")
 
 	//ingress
 	rootCmd.Flags().String("rule-ingress-violation-message", "",
@@ -77,7 +77,7 @@ func initialize() (*config, error) {
 		"Whether ingress tls and host collision should be checked")
 
 	//customizations
-	rootCmd.Flags().String("admission-validation-annotations-prefix", "",
+	rootCmd.Flags().String("annotations-prefix", "",
 		"What prefix should be used for admission validation annotations.")
 
 	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {
