@@ -14,6 +14,7 @@ env:
   - KUBERNETES_VERSION=1.11
   - KUBERNETES_VERSION=1.12
   - KUBERNETES_VERSION=1.13
+  - KUBERNETES_VERSION=1.14
 
 before_install:
   - sudo apt-get update

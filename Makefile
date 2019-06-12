@@ -1,4 +1,4 @@
-KUBERNETES_VERSION=1.9
+KUBERNETES_VERSION=1.14
 DIND_CLUSTER_SCRIPT=dind-cluster-v$(KUBERNETES_VERSION).sh
 DIND_CLUSTER_RELEASE_VERSION=$$(if [ "$(KUBERNETES_VERSION)" = "1.14" ]; then echo v0.2.0; else echo v0.1.0; fi)
 TEST_IMAGE_NAME=webhook-test:latest
@@ -9,7 +9,7 @@ dev-start: setup-test-cluster
 dev-stop: cleanup-test-cluster
 
 dev-e2e-test: deploy-webhook-for-test
-	KUBECTL=$(KUBECTL) go test -tags=e2e -p 1
+	KUBECTL=$(KUBECTL) go test -v -tags=e2e -p 1
 
 ci-e2e-test: setup-test-cluster deploy-webhook-for-test
 	sleep 20 && \

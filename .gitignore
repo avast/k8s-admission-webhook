@@ -4,3 +4,4 @@ test/webhook.yaml
 test/*.csr
 test/*.key
 test/dind-cluster-v*.sh
+.DS_Store
