@@ -113,26 +113,8 @@ func TestAnnotationPrefix(t *testing.T) {
 		err := applyManifest("test/manifests/pod-custom-annot-prefix-default.yaml", true)
 		assert.Nil(t, err)
 	})
-	t.Run("should succeed with empty-string annotation prefix used", func(t *testing.T) {
-		err := deleteManifest("test/webhook.yaml")
-		if assert.Nil(t, err, "Could not disable webhook") {
-			time.Sleep(5 * time.Second)
-
-			file, _ := os.Create("test/webhook-prefix.yaml")
-			sed := exec.Command("sed", "s/#ANNOTATION_PREFIX_NAME_PLACEHOLDER/- name: ANNOTATIONS_PREFIX/; s/#ANNOTATION_PREFIX_VALUE_PLACEHOLDER/value: \"\"/", "test/webhook.yaml")
-			sed.Stdout = file
-			sed.Start()
-
-			err = applyManifest("test/webhook-prefix.yaml", false)
-			time.Sleep(5 * time.Second)
-			if assert.Nil(t, err, "Could not apply webhook") {
-				err = applyManifest("test/manifests/pod-custom-annot-prefix-default.yaml", true)
-				assert.Nil(t, err)
-			}
-		}
-	})
 	t.Run("should succeed with custom string annotation prefix used", func(t *testing.T) {
-		err := deleteManifest("test/webhook-prefix.yaml")
+		err := deleteManifest("test/webhook.yaml")
 		if assert.Nil(t, err, "Could not disable webhook") {
 			time.Sleep(5 * time.Second)
 			

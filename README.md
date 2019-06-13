@@ -69,12 +69,9 @@ Note that every option can also be specified via an environment variable: enviro
 In case you want to check `readOnlyRootFilesystem` property globally but also allow some containers requiring writable root filesystem, they can be whitelisted by using annotations.
 In order to do that you need to:
 * Allow whitelisting of containers for this option by `--rule-security-readonly-rootfs-required-whitelist-enabled` option
-* Provide annotation `readonly-rootfs-containers-whitelist` at Pod level (by default, this annotation does not have prefix)
-* If you want to add prefix for all admission validation annotations, use `--annotations-prefix` option
+* Provide annotation `admission.validation.avast.com/readonly-rootfs-containers-whitelist` at Pod level (prefix can be changed by `--annotations-prefix` option)
 
-Example:
-* Default usage of annotation `readonly-rootfs-containers-whitelist: "{container_name_1}, {container_name_2}"`
-* Usage of annotation with custom prefix `{custom.prefix}/readonly-rootfs-containers-whitelist: "{container_name_1}, {container_name_2}"`
+Example usage:
 ```
 apiVersion: v1
 kind: Pod
@@ -82,7 +79,7 @@ metadata:
   name: pod-name
   namespace: test
   annotations:
-    readonly-rootfs-containers-whitelist: "container-name-1, container-name-2"
+    admission.validation.avast.com/readonly-rootfs-containers-whitelist: "container-name-1, container-name-2"
 spec:
   containers:
     - name: container-name-1

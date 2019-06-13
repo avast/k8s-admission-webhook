@@ -4,7 +4,7 @@ metadata:
   name: pod-readonly-rootfs-annotation-missing
   namespace: test
   annotations:
-    readonly-rootfs-containers-whitelist: "sleep-writable"
+    admission.validation.avast.com/readonly-rootfs-containers-whitelist: "sleep-writable"
 spec:
   containers:
     - name: sleep

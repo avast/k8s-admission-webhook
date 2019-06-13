@@ -8,7 +8,7 @@ spec:
     metadata:
       name: job-complete
       annotations:
-        readonly-rootfs-containers-whitelist: "sleep"
+        admission.validation.avast.com/readonly-rootfs-containers-whitelist: "sleep"
     spec:
       containers:
         - name: sleep

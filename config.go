@@ -77,7 +77,7 @@ func initialize() (*config, error) {
 		"Whether ingress tls and host collision should be checked")
 
 	//customizations
-	rootCmd.Flags().String("annotations-prefix", "",
+	rootCmd.Flags().String("annotations-prefix", "admission.validation.avast.com",
 		"What prefix should be used for admission validation annotations.")
 
 	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {

@@ -13,7 +13,7 @@ spec:
       labels:
         app: nginx
       annotations:
-        readonly-rootfs-containers-whitelist: "nginx"
+        admission.validation.avast.com/readonly-rootfs-containers-whitelist: "nginx"
     spec:
       containers:
         - name: nginx
