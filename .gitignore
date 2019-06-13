@@ -1,6 +1,7 @@
 k8s-admission-webhook
 vendor
 test/webhook.yaml
+test/webhook-prefix.yaml
 test/*.csr
 test/*.key
 test/dind-cluster-v*.sh

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"testing"
 	"time"
+	"os"
+	"os/exec"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -103,5 +105,63 @@ func TestUpdate(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestAnnotationPrefix(t *testing.T) {
+	t.Run("should succeed with default annotation prefix used", func(t *testing.T) {
+		err := applyManifest("test/manifests/pod-custom-annot-prefix-default.yaml", true)
+		assert.Nil(t, err)
+	})
+	t.Run("should succeed with empty-string annotation prefix used", func(t *testing.T) {
+		err := deleteManifest("test/webhook.yaml")
+		if assert.Nil(t, err, "Could not disable webhook") {
+			time.Sleep(5 * time.Second)
+
+			file, _ := os.Create("test/webhook-prefix.yaml")
+			sed := exec.Command("sed", "s/#ANNOTATION_PREFIX_NAME_PLACEHOLDER/- name: ANNOTATIONS_PREFIX/; s/#ANNOTATION_PREFIX_VALUE_PLACEHOLDER/value: \"\"/", "test/webhook.yaml")
+			sed.Stdout = file
+			sed.Start()
+
+			err = applyManifest("test/webhook-prefix.yaml", false)
+			time.Sleep(5 * time.Second)
+			if assert.Nil(t, err, "Could not apply webhook") {
+				err = applyManifest("test/manifests/pod-custom-annot-prefix-default.yaml", true)
+				assert.Nil(t, err)
+			}
+		}
+	})
+	t.Run("should succeed with custom string annotation prefix used", func(t *testing.T) {
+		err := deleteManifest("test/webhook-prefix.yaml")
+		if assert.Nil(t, err, "Could not disable webhook") {
+			time.Sleep(5 * time.Second)
+			
+			file, _ := os.Create("test/webhook-prefix.yaml")
+			sed := exec.Command("sed", "s/#ANNOTATION_PREFIX_NAME_PLACEHOLDER/- name: ANNOTATIONS_PREFIX/; s/#ANNOTATION_PREFIX_VALUE_PLACEHOLDER/value: \"custom.test.prefix\"/", "test/webhook.yaml")
+			sed.Stdout = file
+			sed.Start()
+
+			err = applyManifest("test/webhook-prefix.yaml", false)
+			time.Sleep(5 * time.Second)
+			if assert.Nil(t, err, "Could not apply webhook") {
+				err = applyManifest("test/manifests/pod-custom-annot-prefix-set.yaml", true)
+				assert.Nil(t, err)
+			}
+		}
+	})
+	t.Run("should fail because different annotation prefix is used", func(t *testing.T) {
+		err := applyManifest("test/manifests/pod-custom-annot-prefix-wrong.yaml", true)
+		if assert.Error(t, err) {
+			assert.Contains(t, err.Error(), "'securityContext' with 'readOnlyRootFilesystem: true' must be specified")
+		}
+	})
+
+	// Clean up after test
+	err := deleteManifest("test/webhook-prefix.yaml")
+	if assert.Nil(t, err, "Could not disable webhook") {
+		time.Sleep(5 * time.Second)
+		err = applyManifest("test/webhook.yaml", false)
+		assert.Nil(t, err)
+		time.Sleep(5 * time.Second)
 	}
 }
