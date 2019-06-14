@@ -144,7 +144,7 @@ Configuration options for cluster scanner:
 --rule-resource-violation-message                                    Additional message to be included whenever any of the resource-related rules are violated.
 --rule-ingress-collision                                             Whether ingress tls and host collision should be checked 
 --rule-ingress-violation-message                                     Additional message to be included whenever any of the ingress-related rules are violated.
---annotations-prefix  
+--annotations-prefix                                                 What prefix should be used for admission validation annotations.
 ```
 Note that every option can also be specified via an environment variable: environment variables should upper-case, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
 
@@ -165,7 +165,7 @@ On the CI server, end-to-end tests are run via:
 make ci-e2e-test KUBERNETES_VERSION=1.13
 ```
 
-Tests can currently run against versions `1.9` to `1.13` (see (.travis.yml)[.travis.yml] for more details).
+Tests can currently run against versions `1.9` to `1.13` (see [.travis.yml](.travis.yml) for more details).
 
 While `ci-e2e-test` spins up the whole cluster on every run, a more convenient workflow to run end-to-end tests during
 local development is available via:
