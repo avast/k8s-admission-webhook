@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-readonly-rootfs-annotation-missing
+  namespace: test
+  annotations:
+    admission.validation.avast.com/readonly-rootfs-containers-whitelist: "sleep-writable"
+spec:
+  containers:
+    - name: sleep
+      image: tutum/curl
+      command: ["/bin/sleep","infinity"]
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "5M"
+        limits:
+          cpu: "200m"
+          memory: "30M"
+      securityContext:
+          readOnlyRootFilesystem: false
+    - name: sleep-writable
+      image: tutum/curl
+      command: ["/bin/sleep","infinity"]
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "5M"
+        limits:
+          cpu: "200m"
+          memory: "30M"

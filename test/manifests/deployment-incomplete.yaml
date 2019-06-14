@@ -1,7 +1,7 @@
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
-  name: sleep-incomplete
+  name: deployment-incomplete
   namespace: test
 spec:
   replicas: 1
@@ -24,3 +24,5 @@ spec:
           limits:
             # cpu: "251m"
             # memory: "100m"
+        securityContext:
+          # readOnlyRootFilesystem: true

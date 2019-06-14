@@ -1,5 +1,6 @@
-KUBERNETES_VERSION=1.9
+KUBERNETES_VERSION=1.13
 DIND_CLUSTER_SCRIPT=dind-cluster-v$(KUBERNETES_VERSION).sh
+DIND_CLUSTER_RELEASE_VERSION=$$(if [ "$(KUBERNETES_VERSION)" = "1.14" ]; then echo v0.2.0; else echo v0.1.0; fi)
 TEST_IMAGE_NAME=webhook-test:latest
 KUBECTL=~/.kubeadm-dind-cluster/kubectl
 ADMISSION_PLUGIN_LIST=Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota
@@ -8,7 +9,7 @@ dev-start: setup-test-cluster
 dev-stop: cleanup-test-cluster
 
 dev-e2e-test: deploy-webhook-for-test
-	KUBECTL=$(KUBECTL) go test -tags=e2e -p 1
+	KUBECTL=$(KUBECTL) go test -v -tags=e2e -p 1
 
 ci-e2e-test: setup-test-cluster deploy-webhook-for-test
 	sleep 20 && \
@@ -32,10 +33,10 @@ setup-test-cluster:
 	if [ "$(KUBERNETES_VERSION)" = "1.9" ]; then \
 		wget https://raw.githubusercontent.com/kubernetes-sigs/kubeadm-dind-cluster/3cde76608aed0d64895077a0cf2f2e3b9e7323da/fixed/dind-cluster-v1.9.sh -O ./test/$(DIND_CLUSTER_SCRIPT); \
 	else \
-		wget https://github.com/kubernetes-sigs/kubeadm-dind-cluster/releases/download/v0.1.0/$(DIND_CLUSTER_SCRIPT) -O ./test/$(DIND_CLUSTER_SCRIPT); \
+		wget https://github.com/kubernetes-sigs/kubeadm-dind-cluster/releases/download/$(DIND_CLUSTER_RELEASE_VERSION)/$(DIND_CLUSTER_SCRIPT) -O ./test/$(DIND_CLUSTER_SCRIPT); \
 	fi
 	chmod +x ./test/$(DIND_CLUSTER_SCRIPT)
-	export API_SERVER_ADMISSION_ARG=$$(if [ "$(KUBERNETES_VERSION)" = "1.11" ] || [ "$(KUBERNETES_VERSION)" = "1.12" ] || [ "$(KUBERNETES_VERSION)" = "1.13" ]; then echo enable_admission_plugins; else echo admission_control; fi) && \
+	export API_SERVER_ADMISSION_ARG=$$(if [ "$(KUBERNETES_VERSION)" = "1.11" ] || [ "$(KUBERNETES_VERSION)" = "1.12" ] || [ "$(KUBERNETES_VERSION)" = "1.13" ] || [ "$(KUBERNETES_VERSION)" = "1.14" ]; then echo enable_admission_plugins; else echo admission_control; fi) && \
 	  export APISERVER_$${API_SERVER_ADMISSION_ARG}=$(ADMISSION_PLUGIN_LIST) && \
 	  NUM_NODES=1 \
 	    ./test/$(DIND_CLUSTER_SCRIPT) up

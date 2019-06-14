@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: web-complete
+  name: web-complete-annotation-whitelist
   namespace: test
 spec:
   serviceName: "nginx"
@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: nginx
+      annotations:
+        admission.validation.avast.com/readonly-rootfs-containers-whitelist: "nginx"
     spec:
       containers:
         - name: nginx
@@ -26,5 +28,3 @@ spec:
             limits:
               cpu: "200m"
               memory: "30M"
-          securityContext:
-            readOnlyRootFilesystem: true

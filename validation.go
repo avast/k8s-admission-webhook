@@ -23,12 +23,19 @@ type objectValidation struct {
 	Violations *validationViolationSet
 }
 
-func validatePodSpec(validation *objectValidation, podSpec *corev1.PodSpec, config *config) {
+func validatePodSpec(validation *objectValidation, podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec, config *config) {
+	var containerDescription string
 	for _, container := range podSpec.Containers {
-		validateContainerResources(validation, fmt.Sprintf("Container %s", container.Name), &container, config)
+		containerDescription = fmt.Sprintf("Container %s", container.Name)
+
+		validateContainerResources(validation, containerDescription, &container, config)
+		validateContainerSecurityContext(validation, podMetadata, containerDescription, &container, config)
 	}
 	for _, container := range podSpec.InitContainers {
-		validateContainerResources(validation, fmt.Sprintf("Init container %s", container.Name), &container, config)
+		containerDescription = fmt.Sprintf("Init container %s", container.Name)
+
+		validateContainerResources(validation, containerDescription, &container, config)
+		validateContainerSecurityContext(validation, podMetadata, containerDescription, &container, config)
 	}
 }
 
@@ -45,6 +52,19 @@ func validateContainerResources(validation *objectValidation, targetDesc string,
 	validateResource(validation.Violations, targetDesc,
 		container.Resources.Requests, "request", corev1.ResourceMemory,
 		config.RuleResourceRequestMemoryRequired, config.RuleResourceRequestMemoryMustBeNonZero)
+}
+
+func validateContainerSecurityContext(validation *objectValidation, podMetadata *metav1.ObjectMeta, targetDesc string, container *corev1.Container, config *config) {
+	if containerReadonlyFilesystemShouldBeChecked(podMetadata, container.Name, config) {
+		validateContainerReadonlyFilesystem(validation, targetDesc, container.SecurityContext)
+	}
+}
+
+func validateContainerReadonlyFilesystem(validation *objectValidation, targetDesc string, securityContext *corev1.SecurityContext) {
+	if securityContext == nil || securityContext.ReadOnlyRootFilesystem == nil || !*securityContext.ReadOnlyRootFilesystem {
+		msg := "'securityContext' with 'readOnlyRootFilesystem: true' must be specified."
+		validation.Violations.add(validationViolation{targetDesc, msg})
+	}
 }
 
 func validateResource(violationSet *validationViolationSet, targetDesc string, resList corev1.ResourceList,
@@ -78,6 +98,35 @@ func isResourceNonZero(resList corev1.ResourceList, name corev1.ResourceName) bo
 	} else {
 		return true
 	}
+}
+
+func containerReadonlyFilesystemShouldBeChecked(podMetadata *metav1.ObjectMeta, containerName string, config *config) bool {
+	// If readonly root FS check is turned off, do not validate
+	if !config.RuleSecurityReadonlyRootFilesystemRequired {
+		return false
+	}
+
+	// If whitelisting of containers is turned off, validate each container
+	if !config.RuleSecurityReadonlyRootFilesystemRequiredWhitelistEnabled {
+		return true
+	}
+
+	// Check if container is whitelisted by annotation (list of containers in one annotation)
+	annotation := "readonly-rootfs-containers-whitelist"
+	if config.AnnotationsPrefix != "" {
+		annotation = config.AnnotationsPrefix + "/" + annotation
+	}
+	if annotationValue, ok := podMetadata.Annotations[annotation]; ok {
+		whitelistedContainers := strings.Split(annotationValue, ",")
+		for _, parsedContainerName := range whitelistedContainers {
+			parsedContainerName = strings.TrimSpace(parsedContainerName)
+			if parsedContainerName == containerName {
+				return false
+			}
+		}
+	}
+	
+	return true
 }
 
 func (violationSet *validationViolationSet) add(violation validationViolation) {

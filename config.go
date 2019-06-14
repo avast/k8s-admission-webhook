@@ -10,21 +10,24 @@ import (
 )
 
 type config struct {
-	NoTLS                                  bool   `mapstructure:"no-tls"`
-	TLSCertFile                            string `mapstructure:"tls-cert-file"`
-	TLSPrivateKeyFile                      string `mapstructure:"tls-private-key-file"`
-	ListenPort                             int    `mapstructure:"listen-port"`
-	RuleResourceViolationMessage           string `mapstructure:"rule-resource-violation-message"`
-	RuleResourceLimitCPURequired           bool   `mapstructure:"rule-resource-limit-cpu-required"`
-	RuleResourceLimitCPUMustBeNonZero      bool   `mapstructure:"rule-resource-limit-cpu-must-be-nonzero"`
-	RuleResourceLimitMemoryRequired        bool   `mapstructure:"rule-resource-limit-memory-required"`
-	RuleResourceLimitMemoryMustBeNonZero   bool   `mapstructure:"rule-resource-limit-memory-must-be-nonzero"`
-	RuleResourceRequestCPURequired         bool   `mapstructure:"rule-resource-request-cpu-required"`
-	RuleResourceRequestCPUMustBeNonZero    bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
-	RuleResourceRequestMemoryRequired      bool   `mapstructure:"rule-resource-request-memory-required"`
-	RuleResourceRequestMemoryMustBeNonZero bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
-	RuleIngressCollision                   bool   `mapstructure:"rule-ingress-collision"`
-	RuleIngressViolationMessage            string `mapstructure:"rule-ingress-violation-message"`
+	NoTLS                                                       bool   `mapstructure:"no-tls"`
+	TLSCertFile                                                 string `mapstructure:"tls-cert-file"`
+	TLSPrivateKeyFile                                           string `mapstructure:"tls-private-key-file"`
+	ListenPort                                                  int    `mapstructure:"listen-port"`
+	RuleResourceViolationMessage                                string `mapstructure:"rule-resource-violation-message"`
+	RuleResourceLimitCPURequired                                bool   `mapstructure:"rule-resource-limit-cpu-required"`
+	RuleResourceLimitCPUMustBeNonZero                           bool   `mapstructure:"rule-resource-limit-cpu-must-be-nonzero"`
+	RuleResourceLimitMemoryRequired                             bool   `mapstructure:"rule-resource-limit-memory-required"`
+	RuleResourceLimitMemoryMustBeNonZero                        bool   `mapstructure:"rule-resource-limit-memory-must-be-nonzero"`
+	RuleResourceRequestCPURequired                              bool   `mapstructure:"rule-resource-request-cpu-required"`
+	RuleResourceRequestCPUMustBeNonZero                         bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
+	RuleResourceRequestMemoryRequired                           bool   `mapstructure:"rule-resource-request-memory-required"`
+	RuleResourceRequestMemoryMustBeNonZero                      bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
+	RuleSecurityReadonlyRootFilesystemRequired                  bool   `mapstructure:"rule-security-readonly-rootfs-required"`
+	RuleSecurityReadonlyRootFilesystemRequiredWhitelistEnabled  bool   `mapstructure:"rule-security-readonly-rootfs-required-whitelist-enabled"`
+	RuleIngressCollision                                        bool   `mapstructure:"rule-ingress-collision"`
+	RuleIngressViolationMessage                                 string `mapstructure:"rule-ingress-violation-message"`
+	AnnotationsPrefix                                           string `mapstructure:"annotations-prefix"`
 }
 
 var rootCmd = &cobra.Command{
@@ -42,7 +45,8 @@ func initialize() (*config, error) {
 		"Path to the certificate key file. Required, unless --no-tls is set.")
 	rootCmd.Flags().Int32("listen-port", 443,
 		"Port to listen on.")
-	//resources
+
+	//pod
 	rootCmd.Flags().String("rule-resource-violation-message", "",
 		"Additional message to be included whenever any of the resource-related rules are violated.")
 	rootCmd.Flags().Bool("rule-resource-limit-cpu-required", false,
@@ -61,12 +65,20 @@ func initialize() (*config, error) {
 		"Whether 'memory' request in resource specifications is required.")
 	rootCmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
 		"Whether 'memory' request in resource specifications must be a nonzero value.")
+	rootCmd.Flags().Bool("rule-security-readonly-rootfs-required", false,
+		"Whether 'readOnlyRootFilesystem' in security context specifications is required.")
+	rootCmd.Flags().Bool("rule-security-readonly-rootfs-required-whitelist-enabled", false,
+		"Whether rule 'readOnlyRootFilesystem' in security context can be ignored by container whitelisting.")
 
 	//ingress
 	rootCmd.Flags().String("rule-ingress-violation-message", "",
 		"Additional message to be included whenever any of the ingress-related rules are violated.")
 	rootCmd.Flags().Bool("rule-ingress-collision", false,
 		"Whether ingress tls and host collision should be checked")
+
+	//customizations
+	rootCmd.Flags().String("annotations-prefix", "admission.validation.avast.com",
+		"What prefix should be used for admission validation annotations.")
 
 	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {
 		return errorWithUsage(err)

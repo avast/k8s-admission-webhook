@@ -37,6 +37,8 @@ spec:
           ports:
             - containerPort: 8443
           env:
+            #ANNOTATION_PREFIX_NAME_PLACEHOLDER
+              #ANNOTATION_PREFIX_VALUE_PLACEHOLDER
             - name: TLS_CERT_FILE
               value: /data/ssl_certs/server-cert.pem
             - name: TLS_PRIVATE_KEY_FILE
@@ -60,6 +62,10 @@ spec:
             - name: RULE_RESOURCE_REQUEST_MEMORY_REQUIRED
               value: "true"
             - name: RULE_RESOURCE_REQUEST_MEMORY_MUST_BE_NONZERO
+              value: "true"
+            - name: RULE_SECURITY_READONLY_ROOTFS_REQUIRED
+              value: "true"
+            - name: RULE_SECURITY_READONLY_ROOTFS_REQUIRED_WHITELIST_ENABLED
               value: "true"
             - name: RULE_INGRESS_VIOLATION_MESSAGE
               value: "For more information, see https://internal.wiki/ingresses"

@@ -1,12 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: job-complete
+  name: job-complete-annotation-whitelist
   namespace: test
 spec:
   template:
     metadata:
       name: job-complete
+      annotations:
+        admission.validation.avast.com/readonly-rootfs-containers-whitelist: "sleep"
     spec:
       containers:
         - name: sleep
@@ -19,6 +21,4 @@ spec:
             limits:
               cpu: "200m"
               memory: "30M"
-          securityContext:
-            readOnlyRootFilesystem: true
       restartPolicy: Never

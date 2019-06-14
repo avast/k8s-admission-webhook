@@ -24,3 +24,4 @@ spec:
           limits:
             cpu: "0m"
             memory: "0M"
+        securityContext:

@@ -1,13 +1,16 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: cronjob-complete
+  name: cronjob-complete-annotation-whitelist
   namespace: test
 spec:
   schedule: "*/1 * * * *"
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            admission.validation.avast.com/readonly-rootfs-containers-whitelist: "sleep"
         spec:
           containers:
             - name: sleep
@@ -20,6 +23,4 @@ spec:
                 limits:
                   cpu: "200m"
                   memory: "30M"
-              securityContext:
-                readOnlyRootFilesystem: true
           restartPolicy: Never

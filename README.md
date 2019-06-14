@@ -1,8 +1,8 @@
 # k8s-admission-webhook [![](https://images.microbadger.com/badges/version/avastsoftware/k8s-admission-webhook.svg)](https://microbadger.com/images/avastsoftware/k8s-admission-webhook "avastsoftware/k8s-admission-webhook image") [![](https://images.microbadger.com/badges/image/avastsoftware/k8s-admission-webhook.svg)](https://microbadger.com/images/avastsoftware/k8s-admission-webhook "avastsoftware/k8s-admission-webhook image")
 
-| Kubernetes version | v1.9              | v1.10             | v1.11             | v1.12             | v1.13             |
-| ------------------ |-------------------| ------------------| ------------------| ------------------| ------------------|
-| Build status       | [![Build1][1]][4] | [![Build2][2]][4] | [![Build3][3]][4] | [![Build3][4]][4] | [![Build3][5]][4] 
+| Kubernetes version | v1.9                  | v1.10                  | v1.11                  | v1.12                  | v1.13                  |
+| ------------------ |-----------------------| -----------------------| -----------------------| -----------------------| -----------------------|
+| Build status       | [![Build v1.9][1]][6] | [![Build v1.10][2]][6] | [![Build v1.11][3]][6] | [![Build v1.12][4]][6] | [![Build v1.13][5]][6] |
 
 [1]: https://travis-matrix-badges.herokuapp.com/repos/avast/k8s-admission-webhook/branches/master/1
 [2]: https://travis-matrix-badges.herokuapp.com/repos/avast/k8s-admission-webhook/branches/master/2
@@ -16,6 +16,7 @@ A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/refe
 Can be set up to validate that:
 * containers have their resource limits specified (`memory`, `cpu`)
 * containers have their resource requests specified (`memory`, `cpu`)
+* containers have readonly root filesystem
 * ingress rules hosts and paths match regex
 * ingress rules hosts and paths are not in collision with definitions already in the cluster
 * ingress tls hosts match regex
@@ -45,22 +46,54 @@ The webhook application can be configured using the flags outlined below.
 Note that every option can also be specified via an environment variable: environment variables should upper-case, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
 
 ```
---listen-port int32                              Port to listen on. (default 443)
---no-tls                                         Do not use TLS.
---rule-resource-limit-cpu-must-be-nonzero        Whether 'cpu' limit in resource specifications must be a nonzero value.
---rule-resource-limit-cpu-required               Whether 'cpu' limit in resource specifications is required.
---rule-resource-limit-memory-must-be-nonzero     Whether 'memory' limit in resource specifications must be a nonzero value.
---rule-resource-limit-memory-required            Whether 'memory' limit in resource specifications is required.
---rule-resource-request-cpu-must-be-nonzero      Whether 'cpu' request in resource specifications must be a nonzero value.
---rule-resource-request-cpu-required             Whether 'cpu' request in resource specifications is required.
---rule-resource-request-memory-must-be-nonzero   Whether 'memory' request in resource specifications must be a nonzero value.
---rule-resource-request-memory-required          Whether 'memory' request in resource specifications is required.
---rule-resource-violation-message                Additional message to be included whenever any of the resource-related rules are violated.
---rule-ingress-collision                         Whether ingress tls and host collision should be checked 
---rule-ingress-violation-message                 Additional message to be included whenever any of the ingress-related rules are violated.
---tls-cert-file string                           Path to the certificate file. Required, unless --no-tls is set.
---tls-private-key-file string                    Path to the certificate key file. Required, unless --no-tls is set.
+--listen-port int32                                                  Port to listen on. (default 443)
+--no-tls                                                             Do not use TLS.
+--rule-resource-limit-cpu-must-be-nonzero                            Whether 'cpu' limit in resource specifications must be a nonzero value.
+--rule-resource-limit-cpu-required                                   Whether 'cpu' limit in resource specifications is required.
+--rule-resource-limit-memory-must-be-nonzero                         Whether 'memory' limit in resource specifications must be a nonzero value.
+--rule-resource-limit-memory-required                                Whether 'memory' limit in resource specifications is required.
+--rule-resource-request-cpu-must-be-nonzero                          Whether 'cpu' request in resource specifications must be a nonzero value.
+--rule-resource-request-cpu-required                                 Whether 'cpu' request in resource specifications is required.
+--rule-resource-request-memory-must-be-nonzero                       Whether 'memory' request in resource specifications must be a nonzero value.
+--rule-resource-request-memory-required                              Whether 'memory' request in resource specifications is required.
+--rule-security-readonly-rootfs-required                             Whether 'readOnlyRootFilesystem' in security context specifications is required.
+--rule-security-readonly-rootfs-required-whitelist-enabled           Whether rule 'readOnlyRootFilesystem' in security context can be ignored by container whitelisting.
+--rule-resource-violation-message                                    Additional message to be included whenever any of the resource-related rules are violated.
+--rule-ingress-collision                                             Whether ingress tls and host collision should be checked 
+--rule-ingress-violation-message                                     Additional message to be included whenever any of the ingress-related rules are violated.
+--tls-cert-file string                                               Path to the certificate file. Required, unless --no-tls is set.
+--tls-private-key-file string                                        Path to the certificate key file. Required, unless --no-tls is set.
+--annotations-prefix                                                 What prefix should be used for admission validation annotations.
 ```
+
+In case you want to check `readOnlyRootFilesystem` property globally but also allow some containers requiring writable root filesystem, they can be whitelisted by using annotations.
+In order to do that you need to:
+* Allow whitelisting of containers for this option by `--rule-security-readonly-rootfs-required-whitelist-enabled` option
+* Provide annotation `admission.validation.avast.com/readonly-rootfs-containers-whitelist` at Pod level (prefix can be changed by `--annotations-prefix` option)
+
+Example usage:
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-name
+  namespace: test
+  annotations:
+    admission.validation.avast.com/readonly-rootfs-containers-whitelist: "container-name-1, container-name-2"
+spec:
+  containers:
+    - name: container-name-1
+      image: .....
+      command: .....
+      resources:
+        .....
+    - name: container-name-2
+      image: .....
+      command: .....
+      resources:
+        .....
+```
+
 
 ## Installation
 The following instructions assume that you will want to deploy the admission webhook inside the cluster, running as a Kubernetes service.
