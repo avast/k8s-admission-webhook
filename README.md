@@ -13,6 +13,8 @@
 
 A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to aid with enforcing best practices within your cluster.
 
+Apart from webhook validation, this tool can also do [one-time outside of cluster scan](#on-demand-outside-of-cluster-scan) for objects that are violating validation rules.
+
 Can be set up to validate that:
 * containers have their resource limits specified (`memory`, `cpu`)
 * containers have their resource requests specified (`memory`, `cpu`)
@@ -119,6 +121,33 @@ Certain places of the example configuration YAML contain references to variables
 * `${WEBHOOK_CA_BUNDLE}` (in `ValidatingWebhookConfiguration`) is the cluster's CA bundle.
   - This can be retrieved by running `$(kubectl get configmap -n kube-system extension-apiserver-authentication -o=jsonpath='{.data.client-ca-file}' | base64 | tr -d '\n')`. You'll need to have `kubectl` on your `PATH`, with its current context pointing at the target cluster.
 
+## On-demand outside of cluster scan
+This tool provides also function to scan cluster (based on **current context** from `~/.kube/config`) for objects that are violating given rules.
+
+Usage:
+* Create binary via `make build-binary`
+* Run `./k8s-admission-webhook scanner [options]`
+
+Configuration options for cluster scanner:
+```
+--namespace                                                          Whether specific namespace should be scanned. If omitted, all namespaces are scanned.
+--rule-resource-limit-cpu-must-be-nonzero                            Whether 'cpu' limit in resource specifications must be a nonzero value.
+--rule-resource-limit-cpu-required                                   Whether 'cpu' limit in resource specifications is required.
+--rule-resource-limit-memory-must-be-nonzero                         Whether 'memory' limit in resource specifications must be a nonzero value.
+--rule-resource-limit-memory-required                                Whether 'memory' limit in resource specifications is required.
+--rule-resource-request-cpu-must-be-nonzero                          Whether 'cpu' request in resource specifications must be a nonzero value.
+--rule-resource-request-cpu-required                                 Whether 'cpu' request in resource specifications is required.
+--rule-resource-request-memory-must-be-nonzero                       Whether 'memory' request in resource specifications must be a nonzero value.
+--rule-resource-request-memory-required                              Whether 'memory' request in resource specifications is required.
+--rule-security-readonly-rootfs-required                             Whether 'readOnlyRootFilesystem' in security context specifications is required.
+--rule-security-readonly-rootfs-required-whitelist-enabled           Whether rule 'readOnlyRootFilesystem' in security context can be ignored by container whitelisting.
+--rule-resource-violation-message                                    Additional message to be included whenever any of the resource-related rules are violated.
+--rule-ingress-collision                                             Whether ingress tls and host collision should be checked 
+--rule-ingress-violation-message                                     Additional message to be included whenever any of the ingress-related rules are violated.
+--annotations-prefix  
+```
+Note that every option can also be specified via an environment variable: environment variables should upper-case, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
+
 ## Development
 The webhook is written in Go and uses [Glide](https://glide.sh/) for dependency management.
 
@@ -133,10 +162,10 @@ These are some `make` targets intended to be used during local development. Note
 #### Running the end-to-end tests
 On the CI server, end-to-end tests are run via:
 ```
-make ci-e2e-test KUBERNETES_VERSION=1.9
+make ci-e2e-test KUBERNETES_VERSION=1.13
 ```
 
-Other than `1.9`, tests can currently run also against `1.10` and `1.11` (see (.travis.yml)[travis.yml]) for more details.
+Tests can currently run against versions `1.9` to `1.13` (see (.travis.yml)[.travis.yml] for more details).
 
 While `ci-e2e-test` spins up the whole cluster on every run, a more convenient workflow to run end-to-end tests during
 local development is available via:
