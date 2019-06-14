@@ -1,12 +1,7 @@
 package main
 
 import (
-	"strings"
-
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type config struct {
@@ -28,82 +23,41 @@ type config struct {
 	RuleIngressCollision                                        bool   `mapstructure:"rule-ingress-collision"`
 	RuleIngressViolationMessage                                 string `mapstructure:"rule-ingress-violation-message"`
 	AnnotationsPrefix                                           string `mapstructure:"annotations-prefix"`
+	Namespace                                                   string `mapstructure:"namespace"`
 }
 
-var rootCmd = &cobra.Command{
-	Use:  "k8s-admission-webhook",
-	Long: "Kubernetes Admission Webhook",
-	Run:  func(cmd *cobra.Command, args []string) {},
-}
-
-func initialize() (*config, error) {
-	rootCmd.Flags().String("tls-cert-file", "",
-		"Path to the certificate file. Required, unless --no-tls is set.")
-	rootCmd.Flags().Bool("no-tls", false,
-		"Do not use TLS.")
-	rootCmd.Flags().String("tls-private-key-file", "",
-		"Path to the certificate key file. Required, unless --no-tls is set.")
-	rootCmd.Flags().Int32("listen-port", 443,
-		"Port to listen on.")
-
+func initCommonFlags(cmd *cobra.Command) {
 	//pod
-	rootCmd.Flags().String("rule-resource-violation-message", "",
+	cmd.Flags().String("rule-resource-violation-message", "",
 		"Additional message to be included whenever any of the resource-related rules are violated.")
-	rootCmd.Flags().Bool("rule-resource-limit-cpu-required", false,
+	cmd.Flags().Bool("rule-resource-limit-cpu-required", false,
 		"Whether 'cpu' limit in resource specifications is required.")
-	rootCmd.Flags().Bool("rule-resource-limit-cpu-must-be-nonzero", false,
+	cmd.Flags().Bool("rule-resource-limit-cpu-must-be-nonzero", false,
 		"Whether 'cpu' limit in resource specifications must be a nonzero value.")
-	rootCmd.Flags().Bool("rule-resource-limit-memory-required", false,
+	cmd.Flags().Bool("rule-resource-limit-memory-required", false,
 		"Whether 'memory' limit in resource specifications is required.")
-	rootCmd.Flags().Bool("rule-resource-limit-memory-must-be-nonzero", false,
+	cmd.Flags().Bool("rule-resource-limit-memory-must-be-nonzero", false,
 		"Whether 'memory' limit in resource specifications must be a nonzero value.")
-	rootCmd.Flags().Bool("rule-resource-request-cpu-required", false,
+	cmd.Flags().Bool("rule-resource-request-cpu-required", false,
 		"Whether 'cpu' request in resource specifications is required.")
-	rootCmd.Flags().Bool("rule-resource-request-cpu-must-be-nonzero", false,
+	cmd.Flags().Bool("rule-resource-request-cpu-must-be-nonzero", false,
 		"Whether 'cpu' request in resource specifications must be a nonzero value.")
-	rootCmd.Flags().Bool("rule-resource-request-memory-required", false,
+	cmd.Flags().Bool("rule-resource-request-memory-required", false,
 		"Whether 'memory' request in resource specifications is required.")
-	rootCmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
+	cmd.Flags().Bool("rule-resource-request-memory-must-be-nonzero", false,
 		"Whether 'memory' request in resource specifications must be a nonzero value.")
-	rootCmd.Flags().Bool("rule-security-readonly-rootfs-required", false,
+	cmd.Flags().Bool("rule-security-readonly-rootfs-required", false,
 		"Whether 'readOnlyRootFilesystem' in security context specifications is required.")
-	rootCmd.Flags().Bool("rule-security-readonly-rootfs-required-whitelist-enabled", false,
+	cmd.Flags().Bool("rule-security-readonly-rootfs-required-whitelist-enabled", false,
 		"Whether rule 'readOnlyRootFilesystem' in security context can be ignored by container whitelisting.")
 
 	//ingress
-	rootCmd.Flags().String("rule-ingress-violation-message", "",
+	cmd.Flags().String("rule-ingress-violation-message", "",
 		"Additional message to be included whenever any of the ingress-related rules are violated.")
-	rootCmd.Flags().Bool("rule-ingress-collision", false,
+	cmd.Flags().Bool("rule-ingress-collision", false,
 		"Whether ingress tls and host collision should be checked")
 
 	//customizations
-	rootCmd.Flags().String("annotations-prefix", "admission.validation.avast.com",
+	cmd.Flags().String("annotations-prefix", "admission.validation.avast.com",
 		"What prefix should be used for admission validation annotations.")
-
-	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {
-		return errorWithUsage(err)
-	}
-
-	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-
-	if err := rootCmd.Execute(); err != nil {
-		return errorWithUsage(err)
-	}
-
-	c := &config{}
-	if err := viper.Unmarshal(c); err != nil {
-		return errorWithUsage(err)
-	}
-
-	if !c.NoTLS && (c.TLSPrivateKeyFile == "" || c.TLSCertFile == "") {
-		return errorWithUsage(errors.New("Both --tls-cert-file and --tls-private-key-file are required (unless TLS is disabled by setting --no-tls)"))
-	}
-
-	return c, nil
-}
-
-func errorWithUsage(err error) (*config, error) {
-	log.Error(rootCmd.UsageString())
-	return nil, err
 }

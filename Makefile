@@ -53,3 +53,7 @@ copy-image-for-test: build-image-for-test
 	docker rmi $(TEST_IMAGE_NAME)
 
 deploy-webhook-for-test: copy-image-for-test apply-webhook
+
+build-binary:
+	# You might need to call "glide install -v" to download all libs
+	go build -ldflags="-w -s"
