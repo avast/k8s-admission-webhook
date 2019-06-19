@@ -45,7 +45,7 @@ This implementation currently acts as a **validating admission webhook** to vali
 ## Configuration options
 The webhook application can be configured using the flags outlined below.
 
-Note that every option can also be specified via an environment variable: environment variables should upper-case, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
+Note that every option can also be specified via an environment variable. Environment variables should be in uppercase, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
 
 ```
 --listen-port int32                                                  Port to listen on. (default 443)
@@ -146,7 +146,7 @@ Configuration options for cluster scanner:
 --rule-ingress-violation-message                                     Additional message to be included whenever any of the ingress-related rules are violated.
 --annotations-prefix                                                 What prefix should be used for admission validation annotations.
 ```
-Note that every option can also be specified via an environment variable: environment variables should upper-case, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
+Note that every option can also be specified via an environment variable. Environment variables should be in uppercase, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
 
 ## Development
 The webhook is written in Go and uses [Glide](https://glide.sh/) for dependency management.

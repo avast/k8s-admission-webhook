@@ -23,7 +23,7 @@ import (
 var webhookCmd = &cobra.Command {
 	Use:  "webhook",
 	Short:"Starts admission validation webhook",
-	Long: "Starts admission validation webhook verifying incoming objects based on rules spcified by flags",
+	Long: "Starts admission validation webhook verifying incoming objects based on rules specified by flags",
 	Run:  startWebhook,
 }
 

@@ -13,8 +13,8 @@ import (
 
 var scannerCmd = &cobra.Command {
 	Use:  "scanner",
-	Short:"Scans cluster (from current context) for objects vialoting rules",
-	Long: "Scans cluster (from current context) for objects violating rules spciefied by flags",
+	Short:"Scans cluster (from current context) for objects violating rules",
+	Long: "Scans cluster (from current context) for objects violating rules specified by flags",
 	Run:  scanCluster,
 }
 
