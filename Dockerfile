@@ -23,4 +23,4 @@ WORKDIR /app
 
 COPY --from=builder /go/src/github.com/avast/k8s-admission-webhook/k8s-admission-webhook .
 
-ENTRYPOINT ["./k8s-admission-webhook"]
+ENTRYPOINT ["./k8s-admission-webhook", "webhook"]
