@@ -7,15 +7,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
-var scannerCmd = &cobra.Command {
-	Use:  "scanner",
-	Short:"Scans cluster (from current context) for objects violating rules",
-	Long: "Scans cluster (from current context) for objects violating rules specified by flags",
-	Run:  scanCluster,
+var scannerCmd = &cobra.Command{
+	Use:   "scanner",
+	Short: "Scans cluster (from current context) for objects violating rules",
+	Long:  "Scans cluster (from current context) for objects violating rules specified by flags",
+	Run:   scanCluster,
 }
 
 var scannerViper = viper.New()
@@ -49,14 +50,15 @@ func scanCluster(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 	log.Debugf("Init finished!")
-	
-	validatePods(kubeClientSet, config)
-	validateIngresses(kubeClientSet, config)	
+
+	annotationRules := getAnnotationRulesFromConfig(config)
+	validatePods(kubeClientSet, config, annotationRules)
+	validateIngresses(kubeClientSet, config, annotationRules)
 
 	log.Debugf("Check completed!")
 }
 
-func validatePods(clientset *kubernetes.Clientset, config *config) {
+func validatePods(clientset *kubernetes.Clientset, config *config, annotationRules *AnnotationRules) {
 	log.Debugf("Check Pods...")
 
 	namespaceToScan := config.Namespace
@@ -64,6 +66,7 @@ func validatePods(clientset *kubernetes.Clientset, config *config) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
 
 	if namespaceToScan == "" {
 		log.Debugf("There are %d pods in all namespaces", len(pods.Items))
@@ -74,6 +77,9 @@ func validatePods(clientset *kubernetes.Clientset, config *config) {
 	for _, pod := range pods.Items {
 		validation := &objectValidation{"Pod", nil, &validationViolationSet{}}
 		validatePodSpec(validation, &pod.ObjectMeta, &pod.Spec, config)
+		if pod.Kind == "Pod" {
+			validateAnnotationsByRules(validation, &pod.ObjectMeta, "Pod", annotationRules)
+		}
 		if len(validation.Violations.Violations) > 0 {
 			log.Debugf("Pod from namespace '%s' with name '%s' has following violations:", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name)
 			for _, v := range validation.Violations.Violations {
@@ -83,7 +89,7 @@ func validatePods(clientset *kubernetes.Clientset, config *config) {
 	}
 }
 
-func validateIngresses(clientset *kubernetes.Clientset, config *config) {
+func validateIngresses(clientset *kubernetes.Clientset, config *config, annotationRules *AnnotationRules) {
 	log.Debugf("Check Ingresses...")
 
 	namespaceToScan := config.Namespace
@@ -101,6 +107,7 @@ func validateIngresses(clientset *kubernetes.Clientset, config *config) {
 	for _, ingress := range ingresses.Items {
 		validation := &objectValidation{"Ingress", nil, &validationViolationSet{}}
 		ValidateIngress(validation, &ingress, config, clientset)
+		validateAnnotationsByRules(validation, &ingress.ObjectMeta, "Ingress", annotationRules)
 		if len(validation.Violations.Violations) > 0 {
 			log.Debugf("Ingress from namespace '%s' with name '%s' has following violations:", ingress.ObjectMeta.Namespace, ingress.ObjectMeta.Name)
 			for _, v := range validation.Violations.Violations {

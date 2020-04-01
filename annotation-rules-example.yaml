@@ -1,0 +1,10 @@
+annotationRules:
+  Pod:
+    policy: AllowAll
+    exceptions:
+      - "some-nasty-annotation"
+  Ingress:
+    policy: DenyAll
+    exceptions:
+      - "kubectl.kubernetes.io"
+      - "ingress.kubernetes.io"

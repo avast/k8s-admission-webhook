@@ -15,26 +15,25 @@ A general-purpose Kubernetes [admission webhook](https://kubernetes.io/docs/refe
 
 Apart from webhook validation, this tool can also do [one-time outside of cluster scan](#on-demand-outside-of-cluster-scan) for objects that are violating validation rules.
 
-Can be set up to validate that:
-* containers have their resource limits specified (`memory`, `cpu`)
-* containers have their resource requests specified (`memory`, `cpu`)
-* containers have readonly root filesystem
-* ingress rules hosts and paths match regex
-* ingress rules hosts and paths are not in collision with definitions already in the cluster
-* ingress tls hosts match regex
-* ingress tls hosts are not in collision with definitions already in the cluster
+Validation features:
+* Container setup validation
+    * Containers have their resource limits specified (`memory`, `cpu`)
+    * Containers have their resource requests specified (`memory`, `cpu`)
+    * Containers have readonly root filesystem
+* Ingress setup validation
+    * Ingress rules hosts and paths match regex
+    * Ingress rules hosts and paths are not in collision with definitions already in the cluster
+    * Ingress tls hosts match regex
+    * Ingress tls hosts are not in collision with definitions already in the cluster
+* Annotation validation
+    * Annotations match give rule set (See [annotation-rules-example.yaml](annotation-rules-example.yaml))
 
-Resource spec validation operates on:
-* `Pod`s
-* `Deployment`s
-* `ReplicaSet`s
-* `DaemonSet`s
-* `Job`s
-* `CronJob`s
-* `StatefulSet`s
 
-Host and path validation operates on:
-* `Ingress`es
+Validation                 | Operates on
+---------------------------| -------------
+Container setup            | `Pod`s, `Deployment`s, `ReplicaSet`s, `DaemonSet`s, `Job`s, `CronJob`s, `StatefulSet`s
+Ingress setup              | `Ingress`es
+Annotation                 | `Pod`s, `Ingress`es
 
 ## Introduction
 As per [Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/), admission webhooks are
@@ -66,6 +65,7 @@ Note that every option can also be specified via an environment variable. Enviro
 --tls-cert-file string                                               Path to the certificate file. Required, unless --no-tls is set.
 --tls-private-key-file string                                        Path to the certificate key file. Required, unless --no-tls is set.
 --annotations-prefix                                                 What prefix should be used for admission validation annotations.
+--annotation-rules-file                                              File with rules to be used for annotations validation (everything is considered valid if not used).
 ```
 
 In case you want to check `readOnlyRootFilesystem` property globally but also allow some containers requiring writable root filesystem, they can be whitelisted by using annotations.
@@ -145,6 +145,7 @@ Configuration options for cluster scanner:
 --rule-ingress-collision                                             Whether ingress tls and host collision should be checked 
 --rule-ingress-violation-message                                     Additional message to be included whenever any of the ingress-related rules are violated.
 --annotations-prefix                                                 What prefix should be used for admission validation annotations.
+--annotation-rules-file                                              File with rules to be used for annotations validation (everything is considered valid if not used).
 ```
 Note that every option can also be specified via an environment variable. Environment variables should be in uppercase, using `_` instead of `-` as seen in the flag name. E.g.: `--rule-resource-limit-cpu-required` can be alternatively set via an environment variable `RULE_RESOURCE_LIMIT_CPU_REQUIRED=1`.
 
