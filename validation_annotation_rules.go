@@ -79,8 +79,8 @@ func validateAnnotationsByRules(validation *objectValidation, objectMeta *metav1
 type AnnotationRule_Policy string
 
 const (
+	DenyAll  AnnotationRule_Policy = "DenyAll"
 	AllowAll AnnotationRule_Policy = "AllowAll"
-	DenyAll                        = "DenyAll"
 )
 
 type AnnotationRule struct {

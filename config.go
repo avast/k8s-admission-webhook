@@ -5,26 +5,26 @@ import (
 )
 
 type config struct {
-	NoTLS                                                      bool    `mapstructure:"no-tls"`
-	TLSCertFile                                                string  `mapstructure:"tls-cert-file"`
-	TLSPrivateKeyFile                                          string  `mapstructure:"tls-private-key-file"`
-	ListenPort                                                 int     `mapstructure:"listen-port"`
-	RuleResourceViolationMessage                               string  `mapstructure:"rule-resource-violation-message"`
-	RuleResourceLimitCPURequired                               bool    `mapstructure:"rule-resource-limit-cpu-required"`
-	RuleResourceLimitCPUMustBeNonZero                          bool    `mapstructure:"rule-resource-limit-cpu-must-be-nonzero"`
-	RuleResourceLimitMemoryRequired                            bool    `mapstructure:"rule-resource-limit-memory-required"`
-	RuleResourceLimitMemoryMustBeNonZero                       bool    `mapstructure:"rule-resource-limit-memory-must-be-nonzero"`
-	RuleResourceRequestCPURequired                             bool    `mapstructure:"rule-resource-request-cpu-required"`
-	RuleResourceRequestCPUMustBeNonZero                        bool    `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
-	RuleResourceRequestMemoryRequired                          bool    `mapstructure:"rule-resource-request-memory-required"`
-	RuleResourceRequestMemoryMustBeNonZero                     bool    `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
-	RuleSecurityReadonlyRootFilesystemRequired                 bool    `mapstructure:"rule-security-readonly-rootfs-required"`
-	RuleSecurityReadonlyRootFilesystemRequiredWhitelistEnabled bool    `mapstructure:"rule-security-readonly-rootfs-required-whitelist-enabled"`
-	AnnotationRulesFile                                       string `mapstructure:"annotation-rules-file"`
-	RuleIngressCollision                                       bool    `mapstructure:"rule-ingress-collision"`
-	RuleIngressViolationMessage                                string  `mapstructure:"rule-ingress-violation-message"`
-	AnnotationsPrefix                                          string  `mapstructure:"annotations-prefix"`
-	Namespace                                                  string  `mapstructure:"namespace"`
+	NoTLS                                                      bool   `mapstructure:"no-tls"`
+	TLSCertFile                                                string `mapstructure:"tls-cert-file"`
+	TLSPrivateKeyFile                                          string `mapstructure:"tls-private-key-file"`
+	ListenPort                                                 int    `mapstructure:"listen-port"`
+	RuleResourceViolationMessage                               string `mapstructure:"rule-resource-violation-message"`
+	RuleResourceLimitCPURequired                               bool   `mapstructure:"rule-resource-limit-cpu-required"`
+	RuleResourceLimitCPUMustBeNonZero                          bool   `mapstructure:"rule-resource-limit-cpu-must-be-nonzero"`
+	RuleResourceLimitMemoryRequired                            bool   `mapstructure:"rule-resource-limit-memory-required"`
+	RuleResourceLimitMemoryMustBeNonZero                       bool   `mapstructure:"rule-resource-limit-memory-must-be-nonzero"`
+	RuleResourceRequestCPURequired                             bool   `mapstructure:"rule-resource-request-cpu-required"`
+	RuleResourceRequestCPUMustBeNonZero                        bool   `mapstructure:"rule-resource-request-cpu-must-be-nonzero"`
+	RuleResourceRequestMemoryRequired                          bool   `mapstructure:"rule-resource-request-memory-required"`
+	RuleResourceRequestMemoryMustBeNonZero                     bool   `mapstructure:"rule-resource-request-memory-must-be-nonzero"`
+	RuleSecurityReadonlyRootFilesystemRequired                 bool   `mapstructure:"rule-security-readonly-rootfs-required"`
+	RuleSecurityReadonlyRootFilesystemRequiredWhitelistEnabled bool   `mapstructure:"rule-security-readonly-rootfs-required-whitelist-enabled"`
+	AnnotationRulesFile                                        string `mapstructure:"annotation-rules-file"`
+	RuleIngressCollision                                       bool   `mapstructure:"rule-ingress-collision"`
+	RuleIngressViolationMessage                                string `mapstructure:"rule-ingress-violation-message"`
+	AnnotationsPrefix                                          string `mapstructure:"annotations-prefix"`
+	Namespace                                                  string `mapstructure:"namespace"`
 }
 
 func initCommonFlags(cmd *cobra.Command) {

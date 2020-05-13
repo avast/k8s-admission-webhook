@@ -2,9 +2,10 @@ annotationRules:
   Pod:
     policy: AllowAll
     exceptions:
-      - "some-nasty-annotation"
+      - "some-nasty-annotation-prefix-"
+      - "another-nasty-annotation-prefix-"
   Ingress:
     policy: DenyAll
     exceptions:
-      - "kubectl.kubernetes.io"
-      - "ingress.kubernetes.io"
+      - "allowed-annotation-prefix-"
+      - "another-allowed-annotation-prefix"

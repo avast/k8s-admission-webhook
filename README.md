@@ -26,7 +26,7 @@ Validation features:
     * Ingress tls hosts match regex
     * Ingress tls hosts are not in collision with definitions already in the cluster
 * Annotation validation
-    * Annotations match give rule set (See [annotation-rules-example.yaml](annotation-rules-example.yaml))
+    * Annotations match given prefix rule set (See [annotation-rules-example.yaml](annotation-rules-example.yaml))
 
 
 Validation                 | Operates on

@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -67,7 +66,6 @@ func validatePods(clientset *kubernetes.Clientset, config *config, annotationRul
 		log.Fatal(err.Error())
 	}
 
-
 	if namespaceToScan == "" {
 		log.Debugf("There are %d pods in all namespaces", len(pods.Items))
 	} else {
@@ -77,9 +75,7 @@ func validatePods(clientset *kubernetes.Clientset, config *config, annotationRul
 	for _, pod := range pods.Items {
 		validation := &objectValidation{"Pod", nil, &validationViolationSet{}}
 		validatePodSpec(validation, &pod.ObjectMeta, &pod.Spec, config)
-		if pod.Kind == "Pod" {
-			validateAnnotationsByRules(validation, &pod.ObjectMeta, "Pod", annotationRules)
-		}
+		validateAnnotationsByRules(validation, &pod.ObjectMeta, "Pod", annotationRules)
 		if len(validation.Violations.Violations) > 0 {
 			log.Debugf("Pod from namespace '%s' with name '%s' has following violations:", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name)
 			for _, v := range validation.Violations.Violations {
