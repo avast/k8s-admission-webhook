@@ -1,0 +1,11 @@
+annotationRules:
+  Pod:
+    policy: AllowAll
+    exceptions:
+      - "some-nasty-annotation-prefix-"
+      - "another-nasty-annotation-prefix-"
+  Ingress:
+    policy: DenyAll
+    exceptions:
+      - "allowed-annotation-prefix-"
+      - "another-allowed-annotation-prefix"

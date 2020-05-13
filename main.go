@@ -29,3 +29,9 @@ func errorWithUsage(err error) {
 	log.Error(rootCmd.UsageString())
 	log.Fatal(err)
 }
+
+func checkFatal(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}

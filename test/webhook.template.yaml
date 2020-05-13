@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: k8s-admission-webhook-secret
+  name: k8s-admission-webhook-tls-secret
   namespace: default
 data:
   tls_private_key: ${WEBHOOK_TLS_PRIVATE_KEY_B64}
@@ -9,11 +9,29 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: k8s-admission-webhook-config
+  name: k8s-admission-webhook-tls-config
   namespace: default
 data:
   tls_cert: |
 ${WEBHOOK_TLS_CERT}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-admission-webhook-config
+  namespace: default
+data:
+  annotation_rules_config: |
+    annotationRules:
+      Pod:
+        policy: AllowAll
+        exceptions:
+          - "some-nasty-annotation"
+      Ingress:
+        policy: DenyAll
+        exceptions:
+          - "kubectl.kubernetes.io"
+          - "ingress.kubernetes.io"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -71,6 +89,8 @@ spec:
               value: "For more information, see https://internal.wiki/ingresses"
             - name: RULE_INGRESS_COLLISION
               value: "true"
+            - name: ANNOTATION_RULES_FILE
+              value: /data/config/annotation-rules.yaml
           volumeMounts:
             - name: ssl-certs
               mountPath: "/data/ssl_certs"
@@ -78,16 +98,26 @@ spec:
             - name: ssl-keys
               mountPath: "/data/ssl_keys"
               readOnly: true
+            - name: config
+              mountPath: "/data/config"
+              readOnly: true
+
       volumes:
-        - name: ssl-certs
+        - name: config
           configMap:
             name: k8s-admission-webhook-config
+            items:
+              - key: annotation_rules_config
+                path: annotation-rules.yaml
+        - name: ssl-certs
+          configMap:
+            name: k8s-admission-webhook-tls-config
             items:
               - key: tls_cert
                 path: server-cert.pem
         - name: ssl-keys
           secret:
-            secretName: k8s-admission-webhook-secret
+            secretName: k8s-admission-webhook-tls-secret
             items:
               - key: tls_private_key
                 path: server-key.pem

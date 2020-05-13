@@ -1,16 +1,16 @@
 package main
 
 import (
-	"strings"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"k8s.io/api/admission/v1beta1"
+	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
@@ -62,6 +62,8 @@ func startWebhook(cmd *cobra.Command, args []string) {
 	}
 
 	log.Debugf("Configuration is: %+v", config)
+	annotationRules := getAnnotationRulesFromConfig(config)
+	log.Debugf("Annotation rules are: %+v", annotationRules)
 
 	//initialize kube client
 	kubeClientSet, kubeClientSetErr := KubeClientSet(true)
@@ -69,7 +71,7 @@ func startWebhook(cmd *cobra.Command, args []string) {
 		log.Fatal(kubeClientSetErr)
 	}
 
-	http.HandleFunc("/validate", admitFunc(validate).serve(config, kubeClientSet))
+	http.HandleFunc("/validate", admitFunc(validate).serve(config, kubeClientSet, annotationRules))
 
 	addr := fmt.Sprintf(":%v", config.ListenPort)
 	var httpErr error
@@ -88,11 +90,13 @@ func startWebhook(cmd *cobra.Command, args []string) {
 	}
 }
 
-func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.Clientset) *v1beta1.AdmissionResponse {
+func validate(ar admissionv1beta1.AdmissionReview, config *config, clientSet *kubernetes.Clientset, annotationRules *AnnotationRules) *admissionv1beta1.AdmissionResponse {
 	validation := &objectValidation{ar.Request.Kind.Kind, nil, &validationViolationSet{}}
 	deserializer := codecs.UniversalDeserializer()
 
 	raw := ar.Request.Object.Raw
+
+
 	var configMessage string
 	switch ar.Request.Kind.Kind {
 	case "Pod":
@@ -106,6 +110,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 		log.Debugf("Admitting Pod: %+v", pod)
 		validation.ObjMeta = &pod.ObjectMeta
 		validatePodSpec(validation, &pod.ObjectMeta, &pod.Spec, config)
+		validateAnnotationsByRules(validation, &pod.ObjectMeta, ar.Request.Kind.Kind, annotationRules)
 
 	case "ReplicaSet":
 		configMessage = config.RuleResourceViolationMessage
@@ -181,6 +186,7 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 		if err != nil {
 			return toAdmissionResponse(err)
 		}
+		validateAnnotationsByRules(validation, &ingress.ObjectMeta, ar.Request.Kind.Kind, annotationRules)
 
 	case "StatefulSet":
 		configMessage = config.RuleResourceViolationMessage
@@ -193,12 +199,11 @@ func validate(ar v1beta1.AdmissionReview, config *config, clientSet *kubernetes.
 		log.Debugf("Admitting stateful set: %+v", statefulSet)
 		validation.ObjMeta = &statefulSet.ObjectMeta
 		validatePodSpec(validation, &statefulSet.Spec.Template.ObjectMeta, &statefulSet.Spec.Template.Spec, config)
-
 	default:
 		log.Warnf("Admitted an unexpected resource: %v", ar.Request.Kind)
 	}
 
-	reviewResponse := v1beta1.AdmissionResponse{}
+	reviewResponse := admissionv1beta1.AdmissionResponse{}
 
 	message := validation.message(configMessage)
 	if len(message) > 0 {

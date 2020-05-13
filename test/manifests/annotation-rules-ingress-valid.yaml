@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: annotation-rules-ingress-valid-1
+  namespace: test
+  annotations:
+    ingress.kubernetes.io/proxy-send-timeout: "600"
+
+spec:
+  rules:
+    - host: annotation-rules-ingress-valid-1.avast.com
+      http:
+        paths:
+          - backend:
+              serviceName: nginx
+              servicePort: 80
+  tls:
+    - hosts:
+        - annotation-rules-ingress-valid-1.avast.com
